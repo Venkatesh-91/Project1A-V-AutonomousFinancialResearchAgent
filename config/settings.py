@@ -12,9 +12,11 @@ Uses pydantic-settings so type coercion and validation happen automatically
 string, and a malformed .env fails loudly at startup instead of causing a
 confusing bug three modules deep).
 
-LLM provider: Google Gemini (via the `google-genai` SDK), chosen because it
-has a genuinely free API tier with no billing required -- see
-agent/llm_client.py for the client wrapper.
+LLM provider: Groq (via the official `groq` SDK), chosen after repeated
+free-tier instability with Google Gemini -- see agent/llm_client.py's
+module docstring for the full story. Groq's free tier (30 req/min, no
+observed account-age restrictions) has been the more reliable no-cost
+option for this project.
 """
 
 from __future__ import annotations
@@ -27,9 +29,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    # --- LLM Provider (Google Gemini -- free tier) ---------------------- #
-    gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash"
+    # --- LLM Provider (Groq -- free tier) -------------------------------- #
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
 
     # --- Vector Database ------------------------------------------------ #
     chroma_persist_dir: str = "./data/chroma"
@@ -54,22 +56,29 @@ class Settings(BaseSettings):
     fmp_api_key: str = ""
     newsapi_key: str = ""
 
+    # --- SEC EDGAR (Day 5) ---------------------------------------------- #
+    # The SEC requires every request to identify the requester via a
+    # descriptive User-Agent (name + contact email). This has a harmless
+    # placeholder default so nothing breaks in tests, but should be set to
+    # your real name/email in .env before making real EDGAR calls.
+    sec_edgar_user_agent: str = "Student Research Project contact@example.com"
+
     def validate_required_for_live_run(self) -> None:
         """
         Call this before making any REAL (non-stub) LLM call. Day 2's tools
         are all mock stubs and don't need this -- but Day 4's agent loop,
-        which actually talks to Gemini, should call this at startup so a
+        which actually talks to Groq, should call this at startup so a
         missing API key fails with a clear message instead of a cryptic
         error three tool calls into a run.
         """
         missing = []
-        if not self.gemini_api_key:
-            missing.append("GEMINI_API_KEY")
+        if not self.groq_api_key:
+            missing.append("GROQ_API_KEY")
         if missing:
             raise ValueError(
                 f"Missing required environment variable(s): {', '.join(missing)}. "
                 f"Copy .env.example to .env and fill these in. Get a free key "
-                f"at https://aistudio.google.com"
+                f"at https://console.groq.com/keys"
             )
 
     def ensure_directories_exist(self) -> None:

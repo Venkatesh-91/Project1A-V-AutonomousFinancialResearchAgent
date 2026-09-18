@@ -101,11 +101,18 @@ def test_validate_arguments_invalid_enum_value(working_registry):
         )
 
 
-def test_validate_arguments_unexpected_extra_argument(working_registry):
-    with pytest.raises(ToolValidationError, match="unexpected argument"):
-        working_registry.validate_arguments(
-            "sample_tool", {"ticker": "AAPL", "not_a_real_param": 123}
-        )
+def test_validate_arguments_drops_unexpected_extra_argument(working_registry):
+    """
+    An unrecognized extra argument (something real LLMs do in practice --
+    see the docstring on validate_arguments) should be silently dropped,
+    not raised, so the tool call can still proceed with the arguments that
+    ARE recognized.
+    """
+    cleaned = working_registry.validate_arguments(
+        "sample_tool", {"ticker": "AAPL", "not_a_real_param": 123}
+    )
+    assert cleaned == {"ticker": "AAPL"}
+    assert "not_a_real_param" not in cleaned
 
 
 def test_validate_arguments_unknown_tool_raises(working_registry):
@@ -133,6 +140,18 @@ def test_dispatch_unknown_tool_raises():
 def test_dispatch_invalid_arguments_raises_before_execution(working_registry):
     with pytest.raises(ToolValidationError):
         working_registry.dispatch("sample_tool")  # missing required 'ticker'
+
+
+def test_dispatch_succeeds_despite_unrecognized_extra_argument(working_registry):
+    """
+    End-to-end confirmation of the fix: dispatch() should NOT crash when
+    the caller (an LLM, in practice) passes an argument the schema doesn't
+    define -- it should drop it and proceed with the call.
+    """
+    result = working_registry.dispatch("sample_tool", ticker="AAPL", source="web")
+    assert result.success is True
+    # the tool implementation only ever saw the recognized argument
+    assert result.data["echo"] == {"ticker": "AAPL"}
 
 
 def test_dispatch_falls_back_on_primary_failure(sample_schema):
@@ -237,3 +256,66 @@ def test_report_generator_produces_markdown(default_registry):
     assert "# Research Report" in result.data["markdown"]
     assert "Test content here." in result.data["markdown"]
     assert "SEC EDGAR (mock)" in result.data["markdown"]
+
+
+# ---------------------------------------------------------------------- #
+# Nullable optional arguments (added after a real 400 error was observed:
+# Groq validates tool-call arguments server-side against the schema and
+# rejects the whole call if an optional field's schema doesn't explicitly
+# allow null -- and models commonly pass null for unused optional params
+# rather than omitting them).
+# ---------------------------------------------------------------------- #
+@pytest.fixture
+def registry_with_nullable_optional(sample_schema):
+    """A schema where 'year' is optional and explicitly nullable, matching
+    the pattern used in tools/schemas/*.json after the fix."""
+    schema = {
+        "name": "nullable_tool",
+        "description": "A tool with a nullable optional field.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string"},
+                "year": {"type": ["integer", "null"]},
+            },
+            "required": ["ticker"],
+        },
+    }
+
+    def echo(**kwargs) -> ToolResult:
+        return ToolResult(
+            success=True,
+            data={"received_kwargs": kwargs},
+            source_name="nullable_tool",
+            source_tier=1,
+            retrieved_at="2025-01-01T00:00:00+00:00",
+        )
+
+    registry = ToolRegistry()
+    registry.register("nullable_tool", schema, echo)
+    return registry
+
+
+def test_validate_arguments_accepts_null_for_nullable_field(registry_with_nullable_optional):
+    # should not raise
+    cleaned = registry_with_nullable_optional.validate_arguments(
+        "nullable_tool", {"ticker": "AAPL", "year": None}
+    )
+    # the null value is dropped entirely rather than passed through as None
+    assert cleaned == {"ticker": "AAPL"}
+    assert "year" not in cleaned
+
+
+def test_dispatch_succeeds_when_optional_field_is_explicitly_null(registry_with_nullable_optional):
+    """End-to-end: the exact real-world scenario that broke against Groq --
+    an LLM calling a tool with an optional field explicitly set to null."""
+    result = registry_with_nullable_optional.dispatch("nullable_tool", ticker="AAPL", year=None)
+    assert result.success is True
+    assert "year" not in result.data["received_kwargs"]
+
+
+def test_validate_arguments_rejects_null_for_non_nullable_field(working_registry):
+    """A required (non-nullable) field being null should still fail clearly
+    -- only fields the schema explicitly marks nullable tolerate null."""
+    with pytest.raises(ToolValidationError, match="does not allow null"):
+        working_registry.validate_arguments("sample_tool", {"ticker": None})

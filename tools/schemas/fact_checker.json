@@ -9,10 +9,18 @@
         "description": "The specific factual claim to verify"
       },
       "sources": {
-        "type": "array",
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "string"
+        },
         "description": "Optional list of source identifiers already gathered to check the claim against"
       }
     },
-    "required": ["claim"]
+    "required": [
+      "claim"
+    ]
   }
 }

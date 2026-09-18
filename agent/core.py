@@ -9,7 +9,7 @@ Section 2.
     them] -> bounded re-planning checkpoint (max N cycles) -> final answer
 
 This module owns the control flow only. It does NOT know how to talk to
-Gemini (that's agent/llm_client.py) or how to interpret a raw response
+Groq (that's agent/llm_client.py) or how to interpret a raw response
 (that's agent/parser.py) or what a tool does (that's tools/tool_registry.py).
 That separation is what makes each piece independently testable -- see
 tests/test_agent.py, which drives ResearchAgent with fake LLM and tool
@@ -18,6 +18,7 @@ implementations and never touches the network.
 
 from __future__ import annotations
 
+import json
 import logging
 import time
 from dataclasses import dataclass, field
@@ -30,6 +31,80 @@ from config.settings import settings
 from tools.tool_registry import ToolRegistry
 
 logger = logging.getLogger(__name__)
+
+# Groq's free tier enforces a hard tokens-PER-MINUTE cap that is shared
+# across input + output (as of this writing, 8,000 TPM for the gpt-oss
+# models this project defaults to -- see agent/llm_client.py's model
+# comment). A multi-tool-call research conversation can easily exceed this
+# just from accumulated tool-result history, well before hitting any
+# request-count limit. Two safeguards address this:
+#   1. Individual tool results are truncated before being added to the
+#      conversation (a single large web-search or filing-text result
+#      shouldn't dominate the budget).
+#   2. The full conversation is checked against a token-count ESTIMATE
+#      before every call and trimmed (oldest tool-turns first) if it's
+#      grown too large -- a lightweight, in-memory precursor to the real
+#      context-window management Day 6's memory system implements
+#      properly (see architecture_specification.md Section 4.1).
+MAX_TOOL_RESULT_CHARS = 800
+MAX_CONVERSATION_CHARS_ESTIMATE = 20000  # ~5,000 tokens at a ~4 chars/token rough estimate
+
+
+def _truncate_tool_result_content(content: str, max_chars: int = MAX_TOOL_RESULT_CHARS) -> str:
+    """Cap a single tool result's serialized size before it enters conversation history."""
+    if len(content) <= max_chars:
+        return content
+    return content[:max_chars] + f"... [truncated {len(content) - max_chars} chars]"
+
+
+def _estimate_tokens(conversation: List[Dict[str, Any]]) -> int:
+    """Rough token estimate (chars / 4) -- good enough to trigger trimming
+    proactively; not meant to be exact."""
+    return len(json.dumps(conversation)) // 4
+
+
+def _trim_conversation_if_needed(
+    conversation: List[Dict[str, Any]], max_chars: int = MAX_CONVERSATION_CHARS_ESTIMATE
+) -> None:
+    """
+    If the conversation has grown past the size budget, drop the OLDEST
+    tool-call/tool-result turn pairs (keeping the original query intact at
+    the start, and the most recent turns intact at the end) until it fits.
+    Mutates `conversation` in place. This is a blunt but effective
+    safeguard -- Day 6 replaces the dropped detail with real long-term
+    memory (vector-retrievable) rather than simply discarding it.
+    """
+    if len(json.dumps(conversation)) <= max_chars:
+        return
+
+    # Never trim the very first message (the original query + plan) or the
+    # most recent few turns (the model needs recent context to keep
+    # reasoning coherently). Drop from just after the first message inward.
+    MIN_KEPT_RECENT_TURNS = 6
+    dropped_any = False
+
+    while len(json.dumps(conversation)) > max_chars and len(conversation) > MIN_KEPT_RECENT_TURNS + 1:
+        # index 1 is the oldest droppable turn (index 0 is the original query)
+        del conversation[1]
+        dropped_any = True
+
+    if dropped_any:
+        conversation.insert(
+            1,
+            {
+                "role": "user",
+                "content": (
+                    "[Note: some earlier tool results were trimmed from this "
+                    "conversation to stay within the model's context budget. "
+                    "Continue researching with what remains.]"
+                ),
+            },
+        )
+        logger.info(
+            "Trimmed conversation history to stay under the token budget "
+            "(estimated ~%d tokens after trim).",
+            _estimate_tokens(conversation),
+        )
 
 
 @dataclass
@@ -132,6 +207,8 @@ class ResearchAgent:
         with no further tool calls, or a limit is hit.
 
         Returns (final_parsed_response, updated_tool_calls_made, stop_reason).
+        Appends every turn (assistant + tool results) to `conversation` as
+        it goes, so the caller always sees the full history reflected.
         """
         tool_defs = self.tool_registry.get_tool_definitions()
 
@@ -145,6 +222,8 @@ class ResearchAgent:
             if time.monotonic() >= deadline:
                 return ParsedResponse(text=None), tool_calls_made, "time_budget_exceeded"
 
+            _trim_conversation_if_needed(conversation)
+
             response = self.llm_client.call(
                 messages=conversation,
                 system=self.system_prompt,
@@ -154,12 +233,15 @@ class ResearchAgent:
 
             trace.append(TraceStep("reasoning", {"text": parsed.text}))
 
+            # Reconstructing the assistant message from parsed fields is
+            # the standard, correct pattern for OpenAI-compatible tool use
+            # -- no opaque signature to preserve here (unlike the Gemini
+            # version of this project).
+            conversation.append(parsed.to_assistant_message())
+
             if not parsed.has_tool_calls:
                 return parsed, tool_calls_made, "no_further_tool_calls"
 
-            conversation.append(parsed.to_model_message())
-
-            function_response_parts = []
             for call in parsed.tool_calls:
                 if tool_calls_made >= max_tool_calls:
                     break
@@ -178,11 +260,18 @@ class ResearchAgent:
                     if result.success
                     else {"error": result.error}
                 )
-                function_response_parts.append(
-                    {"function_response": {"name": call.name, "response": response_payload}}
+                # Groq/OpenAI requires one "tool" role message per tool
+                # call, each referencing that call's own id. Truncate large
+                # results (a big web-search or filing-text payload) before
+                # it enters conversation history -- see the module-level
+                # note on Groq's tight free-tier TPM budget.
+                conversation.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": call.call_id,
+                        "content": _truncate_tool_result_content(json.dumps(response_payload)),
+                    }
                 )
-
-            conversation.append({"role": "user", "parts": function_response_parts})
 
     # ------------------------------------------------------------------ #
     # Step 3: Bounded re-planning checkpoint
@@ -193,6 +282,8 @@ class ResearchAgent:
         loop should continue (more sub-tasks were added to the
         conversation), False if research is judged complete.
         """
+        _trim_conversation_if_needed(conversation)
+
         response = self.llm_client.call(
             messages=conversation + [{"role": "user", "content": build_replan_prompt()}],
             system=self.system_prompt,
@@ -273,9 +364,10 @@ class ResearchAgent:
         )
 
         # --- Step 3: Bounded re-planning ------------------------------- #
+        # Note: _execute() already appends the assistant's own turn to
+        # `conversation` before returning -- no need to append it again here.
         replan_cycles_used = 0
         if stop_reason == "no_further_tool_calls":
-            conversation.append(final_parsed.to_model_message())
             while replan_cycles_used < max_replan_cycles:
                 if tool_calls_made >= max_tool_calls or time.monotonic() >= deadline:
                     break
@@ -286,8 +378,6 @@ class ResearchAgent:
                 final_parsed, tool_calls_made, stop_reason = self._execute(
                     conversation, trace, tool_calls_made, max_tool_calls, deadline
                 )
-                if stop_reason == "no_further_tool_calls":
-                    conversation.append(final_parsed.to_model_message())
 
         # --- Final answer -------------------------------------------------- #
         final_answer = final_parsed.text

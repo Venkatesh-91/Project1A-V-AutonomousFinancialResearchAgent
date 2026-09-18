@@ -10,14 +10,25 @@
       },
       "filing_type": {
         "type": "string",
-        "enum": ["10-K", "10-Q", "8-K", "DEF 14A"],
+        "enum": [
+          "10-K",
+          "10-Q",
+          "8-K",
+          "DEF 14A"
+        ],
         "description": "Type of SEC filing to retrieve"
       },
       "year": {
-        "type": "integer",
+        "type": [
+          "integer",
+          "null"
+        ],
         "description": "Filing year (defaults to most recent if omitted)"
       }
     },
-    "required": ["ticker", "filing_type"]
+    "required": [
+      "ticker",
+      "filing_type"
+    ]
   }
 }

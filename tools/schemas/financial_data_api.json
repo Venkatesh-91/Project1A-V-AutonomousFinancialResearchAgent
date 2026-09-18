@@ -10,19 +10,34 @@
       },
       "statement_type": {
         "type": "string",
-        "enum": ["income_statement", "balance_sheet", "cash_flow", "ratios"],
+        "enum": [
+          "income_statement",
+          "balance_sheet",
+          "cash_flow",
+          "ratios"
+        ],
         "description": "Which financial statement or metric set to retrieve"
       },
       "period": {
         "type": "string",
-        "enum": ["annual", "quarterly"],
+        "enum": [
+          "annual",
+          "quarterly"
+        ],
         "description": "Reporting period granularity"
       },
       "years": {
-        "type": "integer",
+        "type": [
+          "integer",
+          "null"
+        ],
         "description": "Number of historical years/quarters to include"
       }
     },
-    "required": ["ticker", "statement_type", "period"]
+    "required": [
+      "ticker",
+      "statement_type",
+      "period"
+    ]
   }
 }

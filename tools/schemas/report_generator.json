@@ -6,7 +6,13 @@
     "properties": {
       "template": {
         "type": "string",
-        "enum": ["company_profile", "earnings_analysis", "risk_assessment", "comparative_analysis", "full_report"],
+        "enum": [
+          "company_profile",
+          "earnings_analysis",
+          "risk_assessment",
+          "comparative_analysis",
+          "full_report"
+        ],
         "description": "Which report template to use"
       },
       "sections": {
@@ -14,10 +20,19 @@
         "description": "Section name to content mapping to populate the template"
       },
       "sources": {
-        "type": "array",
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "string"
+        },
         "description": "List of all sources cited in the report, for the appendix"
       }
     },
-    "required": ["template", "sections"]
+    "required": [
+      "template",
+      "sections"
+    ]
   }
 }

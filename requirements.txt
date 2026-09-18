@@ -1,5 +1,5 @@
-# Core LLM SDK -- Google Gemini (free API tier, no billing required)
-google-genai>=0.3.0
+# Core LLM SDK -- Groq (free tier, no billing required, OpenAI-compatible)
+groq>=0.11.0
 
 # Vector database (local, zero-setup -- see architecture_specification.md Section 4.3)
 chromadb>=0.5.0
@@ -12,7 +12,7 @@ pydantic-settings>=2.0.0
 # Retry logic for external API calls (Section 4.3 / A4.3 error handling)
 tenacity>=8.2.0
 
-# HTTP client (used by tool implementations from Day 5 onward)
+# HTTP client (used by SEC EDGAR and other Day 5 tool implementations)
 httpx>=0.27.0
 
 # Terminal output formatting for the trace log / dev runs
@@ -21,11 +21,15 @@ rich>=13.0.0
 # Testing
 pytest>=8.0.0
 
-# Sentiment analysis (Day 5 news_sentiment tool)
+# Sentiment analysis (news_sentiment tool)
 textblob>=0.18.0
 
-# Web scraping fallback (Day 5/7 tools)
+# Web scraping fallback
 beautifulsoup4>=4.12.0
 
-# Financial data (Day 5 financial_api tool, optional fallback)
+# Financial data (financial_api tool, via yfinance)
 yfinance>=0.2.36
+pandas>=2.0.0
+
+# Free web/news search, no API key required (web_search, news_sentiment tools)
+ddgs>=8.0.0

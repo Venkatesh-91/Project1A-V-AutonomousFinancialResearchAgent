@@ -1,89 +1,153 @@
 """
 sec_edgar.py
 
-Stub implementation of the `sec_filing_search` tool.
+REAL implementation of the `sec_filing_search` tool, using the SEC's free,
+public EDGAR APIs -- no API key required. Two endpoints are used:
 
-Day 5 replaces this with a real call to SEC EDGAR's free full-text search
-API (efts.sec.gov). For now this returns realistic, clearly-labeled mock
-data so the rest of the pipeline (Executor, Synthesis Engine, evaluation
-harness) can be built and tested end-to-end before any network calls are
-wired in.
+  1. https://www.sec.gov/files/company_tickers.json
+     A free, public ticker -> CIK (Central Index Key) lookup table,
+     refreshed periodically by the SEC. Cached for 24 hours since it
+     rarely changes.
+
+  2. https://data.sec.gov/submissions/CIK{cik:010d}.json
+     A company's full filing history. Cached for 1 hour per company.
+
+The SEC's fair-access policy requires every request to identify the
+requester via a descriptive User-Agent header (name + contact email) --
+see https://www.sec.gov/os/webmaster-faq#developers. Set
+SEC_EDGAR_USER_AGENT in your .env to your own name/email before using this
+in anything beyond local testing.
+
+If either the network call or the parsing fails for any reason, this
+raises -- the ToolRegistry's fallback-chain mechanism (see
+tools/tool_registry.py and the registration in build_default_registry())
+automatically routes to sec_edgar_mock.py so a research run degrades
+gracefully instead of crashing.
 """
 
-from datetime import datetime, timezone
-from typing import Optional
+from __future__ import annotations
 
+from datetime import datetime, timezone
+from typing import Any, Dict, Optional
+
+import httpx
+
+from config.settings import settings
+from tools.http_utils import RateLimiter, ttl_cache
 from tools.tool_registry import ToolResult
 
-_MOCK_FILINGS = {
-    ("AAPL", "10-K"): {
-        "filing_date": "2024-11-01",
-        "accession_number": "0000320193-24-000123",
-        "excerpt": (
-            "[MOCK DATA] Apple Inc. Annual Report on Form 10-K. Risk "
-            "factors include supply chain concentration, foreign exchange "
-            "exposure, and intense competition in smartphone and services "
-            "markets."
-        ),
-    },
-    ("TSLA", "10-K"): {
-        "filing_date": "2024-10-23",
-        "accession_number": "0001628280-24-045678",
-        "excerpt": (
-            "[MOCK DATA] Tesla, Inc. Annual Report on Form 10-K. Risk "
-            "factors include production ramp risk, regulatory credit "
-            "revenue dependency, and competitive pressure in the EV market."
-        ),
-    },
-    ("MSFT", "10-K"): {
-        "filing_date": "2024-07-30",
-        "accession_number": "0000789019-24-000098",
-        "excerpt": (
-            "[MOCK DATA] Microsoft Corporation Annual Report on Form 10-K. "
-            "Risk factors include cybersecurity threats, cloud services "
-            "competition, and regulatory scrutiny of AI products."
-        ),
-    },
-}
+# SEC asks for max 10 requests/second; staying well under that.
+_rate_limiter = RateLimiter(min_interval_seconds=0.15)
+
+_TICKER_MAP_URL = "https://www.sec.gov/files/company_tickers.json"
+_SUBMISSIONS_URL_TEMPLATE = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
+
+
+def _headers() -> Dict[str, str]:
+    return {"User-Agent": settings.sec_edgar_user_agent}
+
+
+@ttl_cache(ttl_seconds=86400)  # ticker->CIK mapping rarely changes; cache 24h
+def _get_ticker_to_cik_map() -> Dict[str, int]:
+    """Fetch and cache the SEC's full ticker -> CIK lookup table."""
+    _rate_limiter.wait()
+    response = httpx.get(_TICKER_MAP_URL, headers=_headers(), timeout=10.0)
+    response.raise_for_status()
+    raw = response.json()
+    # raw is like {"0": {"cik_str": 320193, "ticker": "AAPL", "title": "Apple Inc."}, ...}
+    return {entry["ticker"].upper(): entry["cik_str"] for entry in raw.values()}
+
+
+@ttl_cache(ttl_seconds=3600)  # a company's filing history changes infrequently within an hour
+def _get_submissions(cik: int) -> Dict[str, Any]:
+    """Fetch and cache a company's full submission/filing history."""
+    _rate_limiter.wait()
+    url = _SUBMISSIONS_URL_TEMPLATE.format(cik=cik)
+    response = httpx.get(url, headers=_headers(), timeout=10.0)
+    response.raise_for_status()
+    return response.json()
 
 
 def run(ticker: str, filing_type: str, year: Optional[int] = None) -> ToolResult:
     """
-    Mock SEC filing retrieval.
+    Retrieve a real SEC filing's metadata and a link to the filing itself.
 
     Args:
         ticker: Stock ticker symbol, e.g. 'AAPL'.
         filing_type: One of '10-K', '10-Q', '8-K', 'DEF 14A'.
-        year: Optional filing year; ignored in the mock (returns latest).
+        year: Optional filing year to prefer; if omitted, the most recent
+            matching filing is returned.
     """
     ticker = ticker.upper()
-    key = (ticker, filing_type)
 
-    if key not in _MOCK_FILINGS:
+    ticker_map = _get_ticker_to_cik_map()
+    cik = ticker_map.get(ticker)
+    if cik is None:
         return ToolResult(
             success=False,
             data=None,
-            source_name="sec_filing_search",
+            source_name="SEC EDGAR",
+            source_tier=1,
+            retrieved_at=datetime.now(timezone.utc).isoformat(),
+            error=f"No CIK found for ticker '{ticker}' in SEC's ticker table.",
+        )
+
+    submissions = _get_submissions(cik)
+    recent = submissions.get("filings", {}).get("recent", {})
+
+    forms = recent.get("form", [])
+    filing_dates = recent.get("filingDate", [])
+    accession_numbers = recent.get("accessionNumber", [])
+    primary_documents = recent.get("primaryDocument", [])
+
+    matches = []
+    for i, form in enumerate(forms):
+        if form != filing_type:
+            continue
+        filing_date = filing_dates[i]
+        if year is not None and not filing_date.startswith(str(year)):
+            continue
+        matches.append(
+            {
+                "filing_date": filing_date,
+                "accession_number": accession_numbers[i],
+                "primary_document": primary_documents[i],
+            }
+        )
+
+    if not matches:
+        return ToolResult(
+            success=False,
+            data=None,
+            source_name="SEC EDGAR",
             source_tier=1,
             retrieved_at=datetime.now(timezone.utc).isoformat(),
             error=(
-                f"No mock filing available for ticker='{ticker}', "
-                f"filing_type='{filing_type}'. Add an entry to "
-                f"_MOCK_FILINGS, or wait for Day 5's real EDGAR integration."
+                f"No '{filing_type}' filing found for {ticker}"
+                + (f" in {year}" if year else "")
+                + "."
             ),
         )
 
-    filing = _MOCK_FILINGS[key]
+    # matches are already in the order SEC returns them (most recent first)
+    best = matches[0]
+    accession_no_dashes = best["accession_number"].replace("-", "")
+    filing_url = (
+        f"https://www.sec.gov/Archives/edgar/data/{cik}/"
+        f"{accession_no_dashes}/{best['primary_document']}"
+    )
+
     return ToolResult(
         success=True,
         data={
             "ticker": ticker,
+            "cik": cik,
             "filing_type": filing_type,
-            "filing_date": filing["filing_date"],
-            "accession_number": filing["accession_number"],
-            "text_excerpt": filing["excerpt"],
+            "filing_date": best["filing_date"],
+            "accession_number": best["accession_number"],
+            "filing_url": filing_url,
         },
-        source_name="SEC EDGAR (mock)",
+        source_name="SEC EDGAR",
         source_tier=1,  # SEC filings are the highest-trust tier
         retrieved_at=datetime.now(timezone.utc).isoformat(),
     )

@@ -1,34 +1,46 @@
 """
 llm_client.py
 
-Thin wrapper around the Google Gemini API (via the `google-genai` SDK) that
-adds the three things every call in this project needs and the raw SDK
-doesn't give you for free:
+Thin wrapper around the Groq API (via the official `groq` SDK) that adds
+the two things every call in this project needs and the raw SDK doesn't
+give you for free:
 
   1. Retry with exponential backoff on transient errors (rate limits,
      timeouts, 5xx) -- per architecture_specification.md Section A4.3.
   2. Token usage tracking across the whole agent run.
-  3. A simple, provider-agnostic message format that supports multi-turn
-     tool-calling conversations (text + function_call + function_response
-     parts), so agent/core.py never has to import google.genai directly.
 
-Gemini was chosen as the reasoning engine because it has a genuinely free
-API tier that still supports function/tool calling.
+Groq was chosen as the reasoning engine (replacing an earlier Gemini-based
+version) after repeated free-tier instability on Google's side: models
+renamed/deprecated mid-project, a 20-requests-PER-DAY cap on the only
+model our account could still reach, and a newer model restricted to
+"existing users only." Groq's free tier has been consistently generous
+(30 requests/minute, no similar account restrictions observed) and its
+API is OpenAI-compatible, which actually simplifies this client
+considerably: no custom function-declaration types, no opaque
+"thought signature" tokens to round-trip through conversation history --
+plain OpenAI-style messages and tool_calls, which every tool schema in
+tools/schemas/*.json already matches.
 
-This module is intentionally the ONLY place that imports the `google.genai`
-SDK directly.
+This module is intentionally the ONLY place that imports the `groq` SDK
+directly. Every other module calls `LLMClient`, never the SDK -- so if the
+reasoning engine ever needs to switch providers again, this is the one
+file that changes.
 
-Message format used throughout this project (NOT the raw Gemini format):
+Message format used throughout this project (standard OpenAI/Groq shape):
 
-    {"role": "user" | "model", "parts": [<part>, ...]}
+    {"role": "system" | "user" | "assistant" | "tool", "content": "..."}
 
-where <part> is one of:
-    {"text": "..."}
-    {"function_call": {"name": "...", "args": {...}}}
-    {"function_response": {"name": "...", "response": {...}}}
+    # an assistant turn that requests tool calls also carries:
+    {"role": "assistant", "content": None or "...", "tool_calls": [
+        {"id": "...", "type": "function",
+         "function": {"name": "...", "arguments": "<json string>"}}
+    ]}
 
-agent/parser.py converts a raw Gemini response back into this same
-lightweight format so the round-trip stays provider-agnostic.
+    # a tool result is sent back referencing that same call's id:
+    {"role": "tool", "tool_call_id": "...", "content": "<string result>"}
+
+agent/parser.py builds these shapes from a raw Groq response; agent/core.py
+appends them to the running conversation.
 """
 
 from __future__ import annotations
@@ -39,11 +51,18 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from google import genai
-from google.genai import types
-from google.genai.errors import APIError, ClientError, ServerError
+from groq import (
+    APIConnectionError,
+    APIStatusError,
+    APITimeoutError,
+    BadRequestError,
+    Groq,
+    InternalServerError,
+    RateLimitError,
+)
 
 from config.settings import settings
+from tools.http_utils import RateLimiter
 
 logger = logging.getLogger(__name__)
 
@@ -82,76 +101,68 @@ class TokenUsage:
         }
 
 
-def tool_schema_to_gemini_function(schema: Dict[str, Any]) -> types.FunctionDeclaration:
-    """Convert one of this project's tool schemas into a Gemini FunctionDeclaration."""
-    return types.FunctionDeclaration(
-        name=schema["name"],
-        description=schema.get("description", ""),
-        parameters=schema.get("parameters", {"type": "object", "properties": {}}),
-    )
+def tool_schema_to_groq_tool(schema: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Convert one of this project's tool schemas into Groq/OpenAI's tool
+    format. Our schemas (tools/schemas/*.json) are already written in this
+    shape's "function" sub-object, so this is a one-line wrap -- unlike the
+    Gemini version of this client, no field-by-field translation is needed.
+    """
+    return {
+        "type": "function",
+        "function": {
+            "name": schema["name"],
+            "description": schema.get("description", ""),
+            "parameters": schema.get("parameters", {"type": "object", "properties": {}}),
+        },
+    }
 
 
-def _part_dict_to_gemini_part(part: Dict[str, Any]) -> types.Part:
-    """Convert one of this project's lightweight part-dicts into a genai Part."""
-    if "text" in part:
-        return types.Part(text=part["text"])
-    if "function_call" in part:
-        fc = part["function_call"]
-        return types.Part(
-            function_call=types.FunctionCall(name=fc["name"], args=fc.get("args", {}))
-        )
-    if "function_response" in part:
-        fr = part["function_response"]
-        return types.Part(
-            function_response=types.FunctionResponse(
-                name=fr["name"], response=fr.get("response", {})
-            )
-        )
-    raise ValueError(f"Unrecognized part shape: {part!r}")
-
-
-def _message_dict_to_gemini_content(message: Dict[str, Any]) -> types.Content:
-    """Convert one of this project's message dicts into a genai Content object."""
-    # Backward-compatible convenience: a plain {"role": ..., "content": "..."}
-    # message (as used for simple single-turn calls) is treated as one text part.
-    if "content" in message and "parts" not in message:
-        parts = [{"text": message["content"]}]
-    else:
-        parts = message["parts"]
-
-    return types.Content(
-        role=message["role"],
-        parts=[_part_dict_to_gemini_part(p) for p in parts],
-    )
+def _extract_retry_after_seconds(exc: RateLimitError) -> Optional[float]:
+    """
+    Groq (like OpenAI) returns a `Retry-After` header on 429 responses.
+    Prefer honoring that exact value over guessing our own backoff timing.
+    Returns None if it can't be found, so the caller falls back to its own
+    exponential backoff.
+    """
+    response = getattr(exc, "response", None)
+    if response is None:
+        return None
+    retry_after = response.headers.get("retry-after")
+    if retry_after is None:
+        return None
+    try:
+        return float(retry_after)
+    except ValueError:
+        return None
 
 
 class LLMClient:
     """
-    Wraps the Gemini API with retry-with-backoff, token tracking, and a
-    provider-agnostic multi-turn message format.
+    Wraps the Groq API with retry-with-backoff and token tracking.
 
-    Usage (simple, single-turn):
+    Usage:
         client = LLMClient()
         response = client.call(
-            messages=[{"role": "user", "content": "Hello"}],
-        )
-
-    Usage (multi-turn, with tools -- what agent/core.py uses):
-        response = client.call(
-            messages=[
-                {"role": "user", "parts": [{"text": "Research AAPL"}]},
-                {"role": "model", "parts": [{"function_call": {...}}]},
-                {"role": "user", "parts": [{"function_response": {...}}]},
-            ],
+            messages=[{"role": "user", "content": "Research AAPL"}],
             tool_schemas=registry.get_tool_definitions(),
         )
     """
 
-    _RETRYABLE_EXCEPTIONS = (ServerError,)
+    # Errors worth retrying -- a transient server/connection/timeout issue
+    # can succeed on retry. RateLimitError is handled separately below
+    # since it carries its own suggested wait time.
+    _RETRYABLE_EXCEPTIONS = (InternalServerError, APIConnectionError, APITimeoutError)
+
+    # Groq's free tier allows 30 requests/minute (org-wide, not per-model,
+    # and with no account-age restrictions observed -- unlike the Gemini
+    # tier this replaced). Spacing calls 2.2 seconds apart caps at ~27
+    # calls/minute, safely under that ceiling with a small margin.
+    _rate_limiter = RateLimiter(min_interval_seconds=2.2)
 
     def __init__(self, api_key: Optional[str] = None) -> None:
         settings.validate_required_for_live_run()
-        self._client = genai.Client(api_key=api_key or settings.gemini_api_key)
+        self._client = Groq(api_key=api_key or settings.groq_api_key)
         self.usage = TokenUsage()
 
     def call(
@@ -159,47 +170,56 @@ class LLMClient:
         messages: List[Dict[str, Any]],
         system: Optional[str] = None,
         tool_schemas: Optional[List[Dict[str, Any]]] = None,
-        max_tokens: int = 4096,
+        max_tokens: int = 1024,
         model: Optional[str] = None,
     ):
         """
-        Make a single LLM call (which may itself be one turn of a longer
-        multi-turn conversation the caller is managing), retrying transient
-        failures with exponential backoff + jitter, and recording token
-        usage on success.
+        Make a single LLM call, retrying transient failures with
+        exponential backoff + jitter, and recording token usage on success.
+
+        `messages` uses this project's OpenAI/Groq-compatible message
+        format (see module docstring). If `system` is given, it's
+        prepended as a system message for this call only -- it does not
+        need to be stored in the caller's persistent conversation list.
+
+        `max_tokens` defaults to 1024, not a larger value, deliberately --
+        Groq's free tier caps gpt-oss-120b/20b at 8,000 tokens PER MINUTE
+        shared across input and output. Requesting a large completion
+        budget on every call eats into that shared budget fast, especially
+        alongside a growing multi-turn research conversation. 1024 is
+        enough for this project's reasoning/planning/report text; raise it
+        per-call if a specific step genuinely needs more.
         """
-        model = model or settings.gemini_model
+        model = model or settings.groq_model
         delay = settings.retry_initial_delay_seconds
 
-        contents = [_message_dict_to_gemini_content(m) for m in messages]
-
-        config_kwargs: Dict[str, Any] = {"max_output_tokens": max_tokens}
+        full_messages = list(messages)
         if system:
-            config_kwargs["system_instruction"] = system
-        if tool_schemas:
-            function_declarations = [tool_schema_to_gemini_function(s) for s in tool_schemas]
-            config_kwargs["tools"] = [types.Tool(function_declarations=function_declarations)]
+            full_messages = [{"role": "system", "content": system}] + full_messages
 
-        generate_config = types.GenerateContentConfig(**config_kwargs)
+        request_kwargs: Dict[str, Any] = {
+            "model": model,
+            "messages": full_messages,
+            "max_tokens": max_tokens,
+        }
+        if tool_schemas:
+            request_kwargs["tools"] = [tool_schema_to_groq_tool(s) for s in tool_schemas]
 
         for attempt in range(1, settings.max_retry_attempts + 1):
+            self._rate_limiter.wait()
             try:
-                response = self._client.models.generate_content(
-                    model=model,
-                    contents=contents,
-                    config=generate_config,
-                )
+                response = self._client.chat.completions.create(**request_kwargs)
 
-                usage = response.usage_metadata
+                usage = response.usage
                 self.usage.record(
-                    input_tokens=usage.prompt_token_count or 0,
-                    output_tokens=usage.candidates_token_count or 0,
+                    input_tokens=usage.prompt_tokens or 0,
+                    output_tokens=usage.completion_tokens or 0,
                 )
                 logger.debug(
                     "LLM call succeeded on attempt %d (in=%d, out=%d tokens)",
                     attempt,
-                    usage.prompt_token_count or 0,
-                    usage.candidates_token_count or 0,
+                    usage.prompt_tokens or 0,
+                    usage.completion_tokens or 0,
                 )
                 return response
 
@@ -222,13 +242,37 @@ class LLMClient:
                 time.sleep(sleep_time)
                 delay *= 2
 
-            except ClientError as exc:
-                logger.error("Non-retryable client error: %s", exc)
-                raise LLMCallFailedError(f"Non-retryable client error: {exc}") from exc
+            except RateLimitError as exc:
+                if attempt == settings.max_retry_attempts:
+                    logger.error("Rate limit exceeded after %d attempts: %s", attempt, exc)
+                    raise LLMCallFailedError(
+                        f"Rate limit exceeded after {attempt} attempts: {exc}"
+                    ) from exc
 
-            except APIError as exc:
-                logger.error("Gemini API error: %s", exc)
-                raise LLMCallFailedError(f"Gemini API error: {exc}") from exc
+                suggested_delay = _extract_retry_after_seconds(exc)
+                sleep_time = suggested_delay if suggested_delay is not None else delay
+                sleep_time += random.uniform(0, 0.5)
+                logger.warning(
+                    "LLM call attempt %d/%d hit the rate limit (429). Retrying in %.2fs...",
+                    attempt,
+                    settings.max_retry_attempts,
+                    sleep_time,
+                )
+                time.sleep(sleep_time)
+                delay *= 2
+
+            except BadRequestError as exc:
+                # A malformed request will fail identically every time
+                # (bad schema, invalid model name, etc.) -- fail fast
+                # instead of burning the retry budget.
+                logger.error("Non-retryable bad request: %s", exc)
+                raise LLMCallFailedError(f"Non-retryable bad request: {exc}") from exc
+
+            except APIStatusError as exc:
+                # Catch-all for any other 4xx (auth failure, not found,
+                # etc.) -- also non-retryable.
+                logger.error("Non-retryable API error: %s", exc)
+                raise LLMCallFailedError(f"Non-retryable API error: {exc}") from exc
 
         raise LLMCallFailedError("LLM call failed for an unknown reason.")
 

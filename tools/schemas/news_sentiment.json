@@ -9,14 +9,22 @@
         "description": "Company name, ticker, or topic to analyze sentiment for"
       },
       "num_articles": {
-        "type": "integer",
+        "type": [
+          "integer",
+          "null"
+        ],
         "description": "Number of articles to analyze"
       },
       "lookback_days": {
-        "type": "integer",
+        "type": [
+          "integer",
+          "null"
+        ],
         "description": "How many days back to search for articles"
       }
     },
-    "required": ["query"]
+    "required": [
+      "query"
+    ]
   }
 }

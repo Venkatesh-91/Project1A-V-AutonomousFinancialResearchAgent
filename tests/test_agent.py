@@ -7,8 +7,9 @@ LLM client and the REAL tool registry from Day 2 (with its mock tool data
 "Test the agent with a simple query (Challenge 1: Microsoft company
 profile) using mock tool data."
 
-The fake LLM client returns a pre-scripted sequence of responses regardless
-of input, which lets us deterministically drive the agent through:
+The fake LLM client returns a pre-scripted sequence of fake "raw response"
+objects (shaped like a groq ChatCompletion) regardless of input, which lets
+us deterministically drive the agent through:
     plan -> one tool call -> final answer -> re-plan checkpoint (says done)
 and assert on the exact resulting AgentRunResult -- something that isn't
 possible against a real, non-deterministic LLM.
@@ -21,28 +22,72 @@ from typing import Any, Dict, List, Optional
 import pytest
 
 from agent.core import ResearchAgent
-from agent.parser import ParsedResponse, ToolCallRequest
 from tools.tool_registry import build_default_registry
 
 
 # ---------------------------------------------------------------------- #
-# Fakes -- these stand in for LLMClient without making any network calls.
+# Fakes -- these stand in for a real groq ChatCompletion response without
+# making any network calls.
 # ---------------------------------------------------------------------- #
 @dataclass
-class FakeTokenUsage:
-    def summary(self) -> Dict[str, Any]:
-        return {"total_calls": 0, "total_input_tokens": 0, "total_output_tokens": 0, "total_tokens": 0}
+class FakeFunction:
+    name: str
+    arguments: str  # JSON string, matching the real SDK's shape
+
+
+@dataclass
+class FakeToolCall:
+    id: str
+    function: FakeFunction
+
+
+@dataclass
+class FakeMessage:
+    content: Optional[str]
+    tool_calls: Optional[List[FakeToolCall]] = None
+
+
+@dataclass
+class FakeChoice:
+    message: FakeMessage
+
+
+@dataclass
+class FakeUsage:
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+
+
+@dataclass
+class FakeChatCompletion:
+    choices: List[FakeChoice]
+    usage: FakeUsage = field(default_factory=FakeUsage)
+
+
+def make_text_response(text: str) -> FakeChatCompletion:
+    return FakeChatCompletion(choices=[FakeChoice(message=FakeMessage(content=text))])
+
+
+def make_tool_call_response(call_id: str, name: str, args: Dict[str, Any]) -> FakeChatCompletion:
+    return FakeChatCompletion(
+        choices=[
+            FakeChoice(
+                message=FakeMessage(
+                    content=None,
+                    tool_calls=[
+                        FakeToolCall(id=call_id, function=FakeFunction(name=name, arguments=json.dumps(args)))
+                    ],
+                )
+            )
+        ]
+    )
 
 
 class FakeLLMClient:
-    """
-    Returns pre-scripted ParsedResponse-shaped values in sequence,
-    regardless of what messages/tools it's called with. Bypasses
-    agent/parser.py entirely by monkeypatching parse_response in the test
-    below -- simpler than building fake google.genai response objects.
-    """
+    """Returns pre-scripted fake responses in sequence, regardless of what
+    messages/tools it's called with."""
 
-    def __init__(self, scripted_responses: List[ParsedResponse]) -> None:
+    def __init__(self, scripted_responses: List[FakeChatCompletion]) -> None:
         self._responses = list(scripted_responses)
         self.calls_made: List[Dict[str, Any]] = []
 
@@ -52,12 +97,10 @@ class FakeLLMClient:
         )
         if not self._responses:
             raise AssertionError("FakeLLMClient ran out of scripted responses")
-        # Return a sentinel; the test monkeypatches parse_response to map
-        # this sentinel straight back to the next scripted ParsedResponse.
         return self._responses.pop(0)
 
     def get_usage_summary(self) -> Dict[str, Any]:
-        return FakeTokenUsage().summary()
+        return {"total_calls": 0, "total_input_tokens": 0, "total_output_tokens": 0, "total_tokens": 0}
 
 
 @pytest.fixture
@@ -65,44 +108,25 @@ def default_registry():
     return build_default_registry()
 
 
-@pytest.fixture
-def patch_parse_response(monkeypatch):
-    """
-    agent/core.py calls agent.parser.parse_response(response) on whatever
-    LLMClient.call() returns. Since our FakeLLMClient already returns a
-    ready-made ParsedResponse (rather than a raw google.genai object),
-    patch parse_response to be the identity function for these tests.
-    """
-    import agent.core as core_module
-
-    monkeypatch.setattr(core_module, "parse_response", lambda response: response)
-
-
 # ---------------------------------------------------------------------- #
 # Challenge 1 style test: Microsoft company profile, one tool call,
 # no re-planning needed.
 # ---------------------------------------------------------------------- #
-def test_agent_run_simple_company_profile_query(default_registry, patch_parse_response, monkeypatch):
+def test_agent_run_simple_company_profile_query(default_registry):
     scripted = [
         # 1. Planning call
-        ParsedResponse(text=json.dumps(["Get Microsoft's company profile"])),
+        make_text_response(json.dumps(["Get Microsoft's company profile"])),
         # 2. Execution call #1 -- LLM requests the company_profile tool
-        ParsedResponse(
-            text=None,
-            tool_calls=[ToolCallRequest(name="company_profile", args={"ticker": "MSFT"})],
-        ),
+        make_tool_call_response("call_abc123", "company_profile", {"ticker": "MSFT"}),
         # 3. Execution call #2 -- LLM has the tool result, gives final answer
-        ParsedResponse(
-            text=(
-                "Microsoft Corporation (MSFT) is a Technology sector company "
-                "in the Software industry, with a market cap of roughly "
-                "$3.1 trillion."
-            ),
-            tool_calls=[],
+        make_text_response(
+            "Microsoft Corporation (MSFT) is a Technology sector company "
+            "in the Software industry, with a market cap of roughly "
+            "$3.1 trillion."
         ),
         # 4. Re-plan checkpoint -- LLM says research is complete
-        ParsedResponse(
-            text=json.dumps(
+        make_text_response(
+            json.dumps(
                 {"needs_more_research": False, "reason": "Profile is complete.", "additional_tasks": []}
             )
         ),
@@ -145,17 +169,22 @@ def test_agent_run_simple_company_profile_query(default_registry, patch_parse_re
     assert "tool_call" in step_types
     assert "replan_decision" in step_types
 
+    # --- The conversation correctly threaded the tool_call_id through to
+    # the tool result message (required by Groq/OpenAI's protocol) ---
+    last_call_messages = fake_llm.calls_made[-1]["messages"]
+    tool_messages = [m for m in last_call_messages if m.get("role") == "tool"]
+    assert len(tool_messages) == 1
+    assert tool_messages[0]["tool_call_id"] == "call_abc123"
 
-def test_agent_falls_back_to_single_task_plan_on_unparseable_plan(
-    default_registry, patch_parse_response
-):
+
+def test_agent_falls_back_to_single_task_plan_on_unparseable_plan(default_registry):
     """If the planning call doesn't return valid JSON, the agent should
     fall back to a one-item plan (the original query) rather than crash."""
     scripted = [
-        ParsedResponse(text="Sure, I'll get started on that right away!"),  # not JSON
-        ParsedResponse(text="Here is a brief summary.", tool_calls=[]),
-        ParsedResponse(
-            text=json.dumps({"needs_more_research": False, "reason": "done", "additional_tasks": []})
+        make_text_response("Sure, I'll get started on that right away!"),  # not JSON
+        make_text_response("Here is a brief summary."),
+        make_text_response(
+            json.dumps({"needs_more_research": False, "reason": "done", "additional_tasks": []})
         ),
     ]
     fake_llm = FakeLLMClient(scripted)
@@ -167,22 +196,14 @@ def test_agent_falls_back_to_single_task_plan_on_unparseable_plan(
     assert result.final_answer == "Here is a brief summary."
 
 
-def test_agent_respects_max_tool_calls_limit(default_registry, patch_parse_response):
+def test_agent_respects_max_tool_calls_limit(default_registry):
     """The agent must stop calling tools once the limit is hit, even if
     the (fake, uncooperative) LLM keeps requesting more."""
     scripted = [
-        ParsedResponse(text=json.dumps(["Look things up repeatedly"])),
+        make_text_response(json.dumps(["Look things up repeatedly"])),
     ]
-    # Keep requesting the same tool call forever -- the fake will run out
-    # of scripted responses only if the agent fails to respect the limit
-    # and keeps calling past it.
-    for _ in range(5):
-        scripted.append(
-            ParsedResponse(
-                text=None,
-                tool_calls=[ToolCallRequest(name="company_profile", args={"ticker": "MSFT"})],
-            )
-        )
+    for i in range(5):
+        scripted.append(make_tool_call_response(f"call_{i}", "company_profile", {"ticker": "MSFT"}))
 
     fake_llm = FakeLLMClient(scripted)
     agent = ResearchAgent(llm_client=fake_llm, tool_registry=default_registry)
@@ -191,3 +212,63 @@ def test_agent_respects_max_tool_calls_limit(default_registry, patch_parse_respo
 
     assert result.tool_calls_made <= 2
     assert result.termination_reason == "max_tool_calls_reached"
+
+
+# ---------------------------------------------------------------------- #
+# Context-budget management: truncation and trimming (added after a real
+# 413 "request too large" failure was observed against Groq's free tier,
+# which caps gpt-oss-120b/20b at 8,000 tokens/minute shared input+output).
+# ---------------------------------------------------------------------- #
+def test_truncate_tool_result_content_leaves_short_content_unchanged():
+    from agent.core import _truncate_tool_result_content
+
+    short = '{"data": "small"}'
+    assert _truncate_tool_result_content(short) == short
+
+
+def test_truncate_tool_result_content_truncates_long_content():
+    from agent.core import MAX_TOOL_RESULT_CHARS, _truncate_tool_result_content
+
+    long_content = "x" * (MAX_TOOL_RESULT_CHARS + 500)
+    result = _truncate_tool_result_content(long_content)
+    assert len(result) < len(long_content)
+    assert "truncated" in result
+
+
+def test_trim_conversation_if_needed_leaves_small_conversation_unchanged():
+    from agent.core import _trim_conversation_if_needed
+
+    conversation = [
+        {"role": "user", "content": "Research AAPL"},
+        {"role": "assistant", "content": "Sure, looking into it."},
+    ]
+    original = list(conversation)
+    _trim_conversation_if_needed(conversation)
+    assert conversation == original
+
+
+def test_trim_conversation_if_needed_drops_oldest_turns_when_too_large():
+    from agent.core import _trim_conversation_if_needed
+
+    # Build a conversation that's clearly over the default budget: one
+    # original query + many large tool-result turns + a few recent turns.
+    conversation = [{"role": "user", "content": "Research a company in depth"}]
+    for i in range(30):
+        conversation.append(
+            {"role": "tool", "tool_call_id": f"call_{i}", "content": "y" * 2000}
+        )
+    conversation.append({"role": "assistant", "content": "Recent turn 1"})
+    conversation.append({"role": "assistant", "content": "Recent turn 2"})
+
+    original_length = len(conversation)
+    _trim_conversation_if_needed(conversation)
+
+    # Should have shrunk
+    assert len(conversation) < original_length
+    # The original query must survive at the start
+    assert conversation[0]["content"] == "Research a company in depth"
+    # A trim notice should have been inserted
+    assert any("trimmed" in str(m.get("content", "")) for m in conversation)
+    # The most recent turns must survive at the end
+    assert conversation[-1]["content"] == "Recent turn 2"
+    assert conversation[-2]["content"] == "Recent turn 1"

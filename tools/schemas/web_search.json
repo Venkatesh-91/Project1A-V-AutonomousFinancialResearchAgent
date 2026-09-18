@@ -9,14 +9,22 @@
         "description": "Search query text"
       },
       "num_results": {
-        "type": "integer",
+        "type": [
+          "integer",
+          "null"
+        ],
         "description": "Number of results to return (default 10)"
       },
       "date_range": {
-        "type": "string",
+        "type": [
+          "string",
+          "null"
+        ],
         "description": "Optional date range filter, e.g. 'past_week', 'past_month'"
       }
     },
-    "required": ["query"]
+    "required": [
+      "query"
+    ]
   }
 }

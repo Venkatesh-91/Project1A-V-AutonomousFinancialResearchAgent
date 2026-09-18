@@ -9,14 +9,25 @@
         "description": "Stock ticker symbol of the company to find peers for"
       },
       "num_peers": {
-        "type": "integer",
+        "type": [
+          "integer",
+          "null"
+        ],
         "description": "Number of peer companies to include"
       },
       "metrics": {
-        "type": "array",
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "string"
+        },
         "description": "List of metric names to compare across peers (e.g. ['revenue_growth', 'operating_margin'])"
       }
     },
-    "required": ["ticker"]
+    "required": [
+      "ticker"
+    ]
   }
 }
