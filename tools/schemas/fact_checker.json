@@ -1,0 +1,18 @@
+{
+  "name": "fact_checker",
+  "description": "Cross-reference a specific factual claim against multiple sources to verify its accuracy before including it in a report. Use this for any claim you are not highly confident in, especially numerical claims from a single source.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "claim": {
+        "type": "string",
+        "description": "The specific factual claim to verify"
+      },
+      "sources": {
+        "type": "array",
+        "description": "Optional list of source identifiers already gathered to check the claim against"
+      }
+    },
+    "required": ["claim"]
+  }
+}

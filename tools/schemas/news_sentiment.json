@@ -1,0 +1,22 @@
+{
+  "name": "news_sentiment",
+  "description": "Analyze sentiment of recent news articles about a company or topic using NLP. Returns per-article sentiment scores, summaries, and an aggregate sentiment score.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Company name, ticker, or topic to analyze sentiment for"
+      },
+      "num_articles": {
+        "type": "integer",
+        "description": "Number of articles to analyze"
+      },
+      "lookback_days": {
+        "type": "integer",
+        "description": "How many days back to search for articles"
+      }
+    },
+    "required": ["query"]
+  }
+}

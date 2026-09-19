@@ -1,0 +1,23 @@
+{
+  "name": "report_generator",
+  "description": "Format gathered and synthesized research data into a structured investment research report following a specified template. Use this as the final step once all research and synthesis is complete.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "template": {
+        "type": "string",
+        "enum": ["company_profile", "earnings_analysis", "risk_assessment", "comparative_analysis", "full_report"],
+        "description": "Which report template to use"
+      },
+      "sections": {
+        "type": "object",
+        "description": "Section name to content mapping to populate the template"
+      },
+      "sources": {
+        "type": "array",
+        "description": "List of all sources cited in the report, for the appendix"
+      }
+    },
+    "required": ["template", "sections"]
+  }
+}

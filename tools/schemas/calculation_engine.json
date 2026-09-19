@@ -1,0 +1,19 @@
+{
+  "name": "calculation_engine",
+  "description": "Perform financial calculations on already-retrieved data: growth rates, margins, ratios, or a basic discounted cash flow (DCF) valuation. Use this to derive original analysis rather than only quoting pre-computed figures.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "calculation_type": {
+        "type": "string",
+        "enum": ["growth_rate", "margin", "ratio", "dcf"],
+        "description": "Type of calculation to perform"
+      },
+      "inputs": {
+        "type": "object",
+        "description": "Named numerical inputs required for the chosen calculation type"
+      }
+    },
+    "required": ["calculation_type", "inputs"]
+  }
+}

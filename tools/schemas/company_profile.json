@@ -1,0 +1,14 @@
+{
+  "name": "company_profile",
+  "description": "Retrieve basic company information: sector, industry, market cap, key executives, and a business description. Use this early in research to establish context before deeper analysis.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "ticker": {
+        "type": "string",
+        "description": "Stock ticker symbol"
+      }
+    },
+    "required": ["ticker"]
+  }
+}

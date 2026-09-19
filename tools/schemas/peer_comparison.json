@@ -1,0 +1,22 @@
+{
+  "name": "peer_comparison",
+  "description": "Identify a company's industry peers and retrieve comparative financial metrics across them. Use this for competitive positioning and industry comparison tasks.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "ticker": {
+        "type": "string",
+        "description": "Stock ticker symbol of the company to find peers for"
+      },
+      "num_peers": {
+        "type": "integer",
+        "description": "Number of peer companies to include"
+      },
+      "metrics": {
+        "type": "array",
+        "description": "List of metric names to compare across peers (e.g. ['revenue_growth', 'operating_margin'])"
+      }
+    },
+    "required": ["ticker"]
+  }
+}

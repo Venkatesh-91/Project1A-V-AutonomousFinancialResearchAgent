@@ -1,0 +1,22 @@
+{
+  "name": "web_search",
+  "description": "Perform a general web search for current news, analysis, or commentary about a company or financial topic. Use this only when structured tools (financial_data_api, sec_filing_search) would not have the information -- prefer structured data sources for anything numerical.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search query text"
+      },
+      "num_results": {
+        "type": "integer",
+        "description": "Number of results to return (default 10)"
+      },
+      "date_range": {
+        "type": "string",
+        "description": "Optional date range filter, e.g. 'past_week', 'past_month'"
+      }
+    },
+    "required": ["query"]
+  }
+}
