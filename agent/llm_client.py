@@ -2,25 +2,33 @@
 llm_client.py
 
 Thin wrapper around the Google Gemini API (via the `google-genai` SDK) that
-adds the two things every call in this project needs and the raw SDK
+adds the three things every call in this project needs and the raw SDK
 doesn't give you for free:
 
   1. Retry with exponential backoff on transient errors (rate limits,
-     timeouts, 5xx) -- per architecture_specification.md Section A4.3:
-     "initial retry delay 1 second, doubling with each attempt, max 5
-     retries, with jitter."
-  2. Token usage tracking across the whole agent run, so Day 12's token
-     usage analysis and Day 13's cost-optimization work have real numbers
-     to look at.
+     timeouts, 5xx) -- per architecture_specification.md Section A4.3.
+  2. Token usage tracking across the whole agent run.
+  3. A simple, provider-agnostic message format that supports multi-turn
+     tool-calling conversations (text + function_call + function_response
+     parts), so agent/core.py never has to import google.genai directly.
 
 Gemini was chosen as the reasoning engine because it has a genuinely free
-API tier (no billing required) that still supports function/tool calling,
-which this project's tool registry depends on.
+API tier that still supports function/tool calling.
 
 This module is intentionally the ONLY place that imports the `google.genai`
-SDK directly. Every other module calls `LLMClient`, never the SDK -- so if
-the reasoning engine ever needs to switch providers, this is the one file
-that changes.
+SDK directly.
+
+Message format used throughout this project (NOT the raw Gemini format):
+
+    {"role": "user" | "model", "parts": [<part>, ...]}
+
+where <part> is one of:
+    {"text": "..."}
+    {"function_call": {"name": "...", "args": {...}}}
+    {"function_response": {"name": "...", "response": {...}}}
+
+agent/parser.py converts a raw Gemini response back into this same
+lightweight format so the round-trip stays provider-agnostic.
 """
 
 from __future__ import annotations
@@ -75,13 +83,7 @@ class TokenUsage:
 
 
 def tool_schema_to_gemini_function(schema: Dict[str, Any]) -> types.FunctionDeclaration:
-    """
-    Convert one of this project's tool schemas (OpenAI/Anthropic-style
-    function-calling format, as produced by tools/tool_registry.py) into a
-    Gemini FunctionDeclaration. Keeping this conversion in one small
-    function means tool_registry.py itself stays provider-agnostic -- it
-    doesn't need to know Gemini exists.
-    """
+    """Convert one of this project's tool schemas into a Gemini FunctionDeclaration."""
     return types.FunctionDeclaration(
         name=schema["name"],
         description=schema.get("description", ""),
@@ -89,22 +91,62 @@ def tool_schema_to_gemini_function(schema: Dict[str, Any]) -> types.FunctionDecl
     )
 
 
+def _part_dict_to_gemini_part(part: Dict[str, Any]) -> types.Part:
+    """Convert one of this project's lightweight part-dicts into a genai Part."""
+    if "text" in part:
+        return types.Part(text=part["text"])
+    if "function_call" in part:
+        fc = part["function_call"]
+        return types.Part(
+            function_call=types.FunctionCall(name=fc["name"], args=fc.get("args", {}))
+        )
+    if "function_response" in part:
+        fr = part["function_response"]
+        return types.Part(
+            function_response=types.FunctionResponse(
+                name=fr["name"], response=fr.get("response", {})
+            )
+        )
+    raise ValueError(f"Unrecognized part shape: {part!r}")
+
+
+def _message_dict_to_gemini_content(message: Dict[str, Any]) -> types.Content:
+    """Convert one of this project's message dicts into a genai Content object."""
+    # Backward-compatible convenience: a plain {"role": ..., "content": "..."}
+    # message (as used for simple single-turn calls) is treated as one text part.
+    if "content" in message and "parts" not in message:
+        parts = [{"text": message["content"]}]
+    else:
+        parts = message["parts"]
+
+    return types.Content(
+        role=message["role"],
+        parts=[_part_dict_to_gemini_part(p) for p in parts],
+    )
+
+
 class LLMClient:
     """
-    Wraps the Gemini API with retry-with-backoff and token tracking.
+    Wraps the Gemini API with retry-with-backoff, token tracking, and a
+    provider-agnostic multi-turn message format.
 
-    Usage:
+    Usage (simple, single-turn):
         client = LLMClient()
         response = client.call(
             messages=[{"role": "user", "content": "Hello"}],
+        )
+
+    Usage (multi-turn, with tools -- what agent/core.py uses):
+        response = client.call(
+            messages=[
+                {"role": "user", "parts": [{"text": "Research AAPL"}]},
+                {"role": "model", "parts": [{"function_call": {...}}]},
+                {"role": "user", "parts": [{"function_response": {...}}]},
+            ],
             tool_schemas=registry.get_tool_definitions(),
         )
     """
 
-    # Errors worth retrying -- a transient server/rate-limit error can
-    # succeed on retry. A ClientError (e.g. bad request, invalid API key)
-    # will fail identically every time, so it's raised immediately instead
-    # of wasting retry budget on a call that can never succeed.
     _RETRYABLE_EXCEPTIONS = (ServerError,)
 
     def __init__(self, api_key: Optional[str] = None) -> None:
@@ -121,25 +163,15 @@ class LLMClient:
         model: Optional[str] = None,
     ):
         """
-        Make a single LLM call, retrying transient failures with
-        exponential backoff + jitter, and recording token usage on success.
-
-        `messages` uses this project's simple internal format:
-            [{"role": "user"|"assistant", "content": "..."}]
-        which is converted to Gemini's expected `contents` format here, so
-        the rest of the codebase never has to think about Gemini's specific
-        message shape.
+        Make a single LLM call (which may itself be one turn of a longer
+        multi-turn conversation the caller is managing), retrying transient
+        failures with exponential backoff + jitter, and recording token
+        usage on success.
         """
         model = model or settings.gemini_model
         delay = settings.retry_initial_delay_seconds
 
-        contents = [
-            types.Content(
-                role="model" if m["role"] == "assistant" else "user",
-                parts=[types.Part.from_text(text=m["content"])],
-            )
-            for m in messages
-        ]
+        contents = [_message_dict_to_gemini_content(m) for m in messages]
 
         config_kwargs: Dict[str, Any] = {"max_output_tokens": max_tokens}
         if system:
@@ -188,17 +220,13 @@ class LLMClient:
                     sleep_time,
                 )
                 time.sleep(sleep_time)
-                delay *= 2  # exponential backoff
+                delay *= 2
 
             except ClientError as exc:
-                # Non-retryable: bad request, invalid API key, quota
-                # exceeded permanently, etc. Retrying would just fail
-                # identically every time.
                 logger.error("Non-retryable client error: %s", exc)
                 raise LLMCallFailedError(f"Non-retryable client error: {exc}") from exc
 
             except APIError as exc:
-                # Catch-all for any other API error type the SDK raises.
                 logger.error("Gemini API error: %s", exc)
                 raise LLMCallFailedError(f"Gemini API error: {exc}") from exc
 
