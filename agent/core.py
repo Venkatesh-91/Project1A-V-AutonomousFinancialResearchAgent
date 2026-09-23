@@ -28,83 +28,11 @@ from agent.llm_client import LLMClient
 from agent.parser import ParsedResponse, parse_json_from_text, parse_response
 from agent.prompts import build_planning_prompt, build_replan_prompt, build_system_prompt
 from config.settings import settings
+from memory.context_manager import ContextManager
+from memory.episodic import EpisodicMemory
 from tools.tool_registry import ToolRegistry
 
 logger = logging.getLogger(__name__)
-
-# Groq's free tier enforces a hard tokens-PER-MINUTE cap that is shared
-# across input + output (as of this writing, 8,000 TPM for the gpt-oss
-# models this project defaults to -- see agent/llm_client.py's model
-# comment). A multi-tool-call research conversation can easily exceed this
-# just from accumulated tool-result history, well before hitting any
-# request-count limit. Two safeguards address this:
-#   1. Individual tool results are truncated before being added to the
-#      conversation (a single large web-search or filing-text result
-#      shouldn't dominate the budget).
-#   2. The full conversation is checked against a token-count ESTIMATE
-#      before every call and trimmed (oldest tool-turns first) if it's
-#      grown too large -- a lightweight, in-memory precursor to the real
-#      context-window management Day 6's memory system implements
-#      properly (see architecture_specification.md Section 4.1).
-MAX_TOOL_RESULT_CHARS = 800
-MAX_CONVERSATION_CHARS_ESTIMATE = 20000  # ~5,000 tokens at a ~4 chars/token rough estimate
-
-
-def _truncate_tool_result_content(content: str, max_chars: int = MAX_TOOL_RESULT_CHARS) -> str:
-    """Cap a single tool result's serialized size before it enters conversation history."""
-    if len(content) <= max_chars:
-        return content
-    return content[:max_chars] + f"... [truncated {len(content) - max_chars} chars]"
-
-
-def _estimate_tokens(conversation: List[Dict[str, Any]]) -> int:
-    """Rough token estimate (chars / 4) -- good enough to trigger trimming
-    proactively; not meant to be exact."""
-    return len(json.dumps(conversation)) // 4
-
-
-def _trim_conversation_if_needed(
-    conversation: List[Dict[str, Any]], max_chars: int = MAX_CONVERSATION_CHARS_ESTIMATE
-) -> None:
-    """
-    If the conversation has grown past the size budget, drop the OLDEST
-    tool-call/tool-result turn pairs (keeping the original query intact at
-    the start, and the most recent turns intact at the end) until it fits.
-    Mutates `conversation` in place. This is a blunt but effective
-    safeguard -- Day 6 replaces the dropped detail with real long-term
-    memory (vector-retrievable) rather than simply discarding it.
-    """
-    if len(json.dumps(conversation)) <= max_chars:
-        return
-
-    # Never trim the very first message (the original query + plan) or the
-    # most recent few turns (the model needs recent context to keep
-    # reasoning coherently). Drop from just after the first message inward.
-    MIN_KEPT_RECENT_TURNS = 6
-    dropped_any = False
-
-    while len(json.dumps(conversation)) > max_chars and len(conversation) > MIN_KEPT_RECENT_TURNS + 1:
-        # index 1 is the oldest droppable turn (index 0 is the original query)
-        del conversation[1]
-        dropped_any = True
-
-    if dropped_any:
-        conversation.insert(
-            1,
-            {
-                "role": "user",
-                "content": (
-                    "[Note: some earlier tool results were trimmed from this "
-                    "conversation to stay within the model's context budget. "
-                    "Continue researching with what remains.]"
-                ),
-            },
-        )
-        logger.info(
-            "Trimmed conversation history to stay under the token budget "
-            "(estimated ~%d tokens after trim).",
-            _estimate_tokens(conversation),
-        )
 
 
 @dataclass
@@ -154,11 +82,25 @@ class ResearchAgent:
     """
     The main agent. Construct once with an LLMClient and a ToolRegistry,
     then call .run(query) for each research task.
+
+    `episodic_memory`, if provided, receives a full log of every run
+    (plan, every tool call, final answer) after it completes -- see
+    memory/episodic.py. This is optional so tests and quick scripts can
+    construct a ResearchAgent without standing up a SQLite file, but
+    scripts/run_challenge.py always provides one so real runs are logged.
     """
 
-    def __init__(self, llm_client: LLMClient, tool_registry: ToolRegistry) -> None:
+    def __init__(
+        self,
+        llm_client: LLMClient,
+        tool_registry: ToolRegistry,
+        episodic_memory: Optional[EpisodicMemory] = None,
+        context_manager: Optional[ContextManager] = None,
+    ) -> None:
         self.llm_client = llm_client
         self.tool_registry = tool_registry
+        self.episodic_memory = episodic_memory
+        self.context_manager = context_manager or ContextManager()
         self.system_prompt = build_system_prompt()
 
     # ------------------------------------------------------------------ #
@@ -222,7 +164,7 @@ class ResearchAgent:
             if time.monotonic() >= deadline:
                 return ParsedResponse(text=None), tool_calls_made, "time_budget_exceeded"
 
-            _trim_conversation_if_needed(conversation)
+            self.context_manager.trim_conversation_if_needed(conversation)
 
             response = self.llm_client.call(
                 messages=conversation,
@@ -269,7 +211,7 @@ class ResearchAgent:
                     {
                         "role": "tool",
                         "tool_call_id": call.call_id,
-                        "content": _truncate_tool_result_content(json.dumps(response_payload)),
+                        "content": self.context_manager.truncate_tool_result(json.dumps(response_payload)),
                     }
                 )
 
@@ -282,7 +224,7 @@ class ResearchAgent:
         loop should continue (more sub-tasks were added to the
         conversation), False if research is judged complete.
         """
-        _trim_conversation_if_needed(conversation)
+        self.context_manager.trim_conversation_if_needed(conversation)
 
         response = self.llm_client.call(
             messages=conversation + [{"role": "user", "content": build_replan_prompt()}],
@@ -406,7 +348,7 @@ class ResearchAgent:
 
         trace.append(TraceStep("final_answer", {"text": final_answer}))
 
-        return AgentRunResult(
+        result = AgentRunResult(
             query=query,
             plan=plan,
             final_answer=final_answer,
@@ -416,3 +358,16 @@ class ResearchAgent:
             termination_reason=stop_reason,
             token_usage=self.llm_client.get_usage_summary(),
         )
+
+        # Radical-transparency logging (architecture_specification.md
+        # Section 3.2): persist the full run, every trace step included,
+        # to episodic memory -- independent of whatever the LLM itself
+        # chose to store via the vector_db_store tool. A failure here
+        # should never take down an otherwise-successful research run.
+        if self.episodic_memory is not None:
+            try:
+                self.episodic_memory.log_run(result)
+            except Exception:  # noqa: BLE001
+                logger.exception("Failed to log run to episodic memory (run result is unaffected).")
+
+        return result

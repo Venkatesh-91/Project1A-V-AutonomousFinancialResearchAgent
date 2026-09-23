@@ -214,61 +214,6 @@ def test_agent_respects_max_tool_calls_limit(default_registry):
     assert result.termination_reason == "max_tool_calls_reached"
 
 
-# ---------------------------------------------------------------------- #
-# Context-budget management: truncation and trimming (added after a real
-# 413 "request too large" failure was observed against Groq's free tier,
-# which caps gpt-oss-120b/20b at 8,000 tokens/minute shared input+output).
-# ---------------------------------------------------------------------- #
-def test_truncate_tool_result_content_leaves_short_content_unchanged():
-    from agent.core import _truncate_tool_result_content
-
-    short = '{"data": "small"}'
-    assert _truncate_tool_result_content(short) == short
-
-
-def test_truncate_tool_result_content_truncates_long_content():
-    from agent.core import MAX_TOOL_RESULT_CHARS, _truncate_tool_result_content
-
-    long_content = "x" * (MAX_TOOL_RESULT_CHARS + 500)
-    result = _truncate_tool_result_content(long_content)
-    assert len(result) < len(long_content)
-    assert "truncated" in result
-
-
-def test_trim_conversation_if_needed_leaves_small_conversation_unchanged():
-    from agent.core import _trim_conversation_if_needed
-
-    conversation = [
-        {"role": "user", "content": "Research AAPL"},
-        {"role": "assistant", "content": "Sure, looking into it."},
-    ]
-    original = list(conversation)
-    _trim_conversation_if_needed(conversation)
-    assert conversation == original
-
-
-def test_trim_conversation_if_needed_drops_oldest_turns_when_too_large():
-    from agent.core import _trim_conversation_if_needed
-
-    # Build a conversation that's clearly over the default budget: one
-    # original query + many large tool-result turns + a few recent turns.
-    conversation = [{"role": "user", "content": "Research a company in depth"}]
-    for i in range(30):
-        conversation.append(
-            {"role": "tool", "tool_call_id": f"call_{i}", "content": "y" * 2000}
-        )
-    conversation.append({"role": "assistant", "content": "Recent turn 1"})
-    conversation.append({"role": "assistant", "content": "Recent turn 2"})
-
-    original_length = len(conversation)
-    _trim_conversation_if_needed(conversation)
-
-    # Should have shrunk
-    assert len(conversation) < original_length
-    # The original query must survive at the start
-    assert conversation[0]["content"] == "Research a company in depth"
-    # A trim notice should have been inserted
-    assert any("trimmed" in str(m.get("content", "")) for m in conversation)
-    # The most recent turns must survive at the end
-    assert conversation[-1]["content"] == "Recent turn 2"
-    assert conversation[-2]["content"] == "Recent turn 1"
+# Note: context-budget management tests (truncation/trimming) moved to
+# tests/test_memory.py as of Day 6 -- that logic now lives in
+# memory/context_manager.py rather than as free functions in agent/core.py.

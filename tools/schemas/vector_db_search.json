@@ -1,0 +1,22 @@
+{
+  "name": "vector_db_search",
+  "description": "Search the agent's own long-term memory (vector database) for previously researched information before making a new external tool call. Use this early when researching a company you may have already looked into, to avoid redundant work.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "What to search for in long-term memory"
+      },
+      "ticker": {
+        "type": ["string", "null"],
+        "description": "Optional ticker to filter results to a specific company"
+      },
+      "top_k": {
+        "type": ["integer", "null"],
+        "description": "Number of results to return (default 5)"
+      }
+    },
+    "required": ["query"]
+  }
+}

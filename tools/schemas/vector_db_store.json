@@ -1,0 +1,22 @@
+{
+  "name": "vector_db_store",
+  "description": "Store a research finding in the agent's long-term memory for future retrieval. Use this to save a notable, well-supported finding that would be useful in future research sessions about this company.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "content": {
+        "type": "string",
+        "description": "The finding to store, as a clear, self-contained statement"
+      },
+      "ticker": {
+        "type": ["string", "null"],
+        "description": "Ticker symbol this finding relates to"
+      },
+      "source_type": {
+        "type": ["string", "null"],
+        "description": "Where this finding came from, e.g. 'sec_filing', 'earnings_call', 'news', 'analysis'"
+      }
+    },
+    "required": ["content"]
+  }
+}

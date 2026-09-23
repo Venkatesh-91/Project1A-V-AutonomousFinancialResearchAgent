@@ -360,6 +360,8 @@ def build_default_registry() -> ToolRegistry:
         calculator,
         fact_checker,
         report_gen,
+        vector_db_search,
+        vector_db_store,
     )
 
     registry = ToolRegistry()
@@ -386,6 +388,17 @@ def build_default_registry() -> ToolRegistry:
         "report_generator": report_gen,
     }
     for tool_name, module in mock_only_tools.items():
+        schema = registry.load_schema_from_file(tool_name)
+        registry.register(tool_name, schema, module.run)
+
+    # Day 6: real, working long-term memory tools (Chroma-backed, no mock
+    # needed -- a local vector store has no external dependency to fail
+    # over from in the same way an API-backed tool does).
+    memory_tools = {
+        "vector_db_search": vector_db_search,
+        "vector_db_store": vector_db_store,
+    }
+    for tool_name, module in memory_tools.items():
         schema = registry.load_schema_from_file(tool_name)
         registry.register(tool_name, schema, module.run)
 

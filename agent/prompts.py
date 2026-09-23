@@ -32,6 +32,12 @@ RESEARCH_PRINCIPLES: List[str] = [
     "judgment you are drawing from it.",
     "Do not provide investment recommendations (buy/sell/hold) or price "
     "predictions -- this agent produces research and analysis, not advice.",
+    "Before starting deep research on a company, consider using "
+    "vector_db_search to check whether you already have relevant prior "
+    "findings in long-term memory -- this can save redundant tool calls.",
+    "When you learn a notable, well-supported fact worth remembering for "
+    "future research on this company, store it with vector_db_store so "
+    "it can be retrieved in later research sessions.",
 ]
 
 
