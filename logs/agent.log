@@ -692,3 +692,169 @@
 2026-09-23T13:20:13+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 12.000000 seconds
 2026-09-23T13:20:28+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2026-09-23T13:20:28+0530 | INFO     | memory.episodic | Logged run 89903e01-f83f-42c9-bfed-637b1f7edd57 to episodic memory (31 trace steps).
+2026-09-24T00:33:46+0530 | INFO     | config.logging_config | Logging initialized. Console level=INFO, file=logs\agent.log (DEBUG+)
+2026-09-24T00:33:53+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:33:55+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:33:58+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:34:00+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:34:04+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:34:06+0530 | INFO     | httpx | HTTP Request: GET https://www.sec.gov/files/company_tickers.json "HTTP/1.1 200 OK"
+2026-09-24T00:34:07+0530 | INFO     | httpx | HTTP Request: GET https://data.sec.gov/submissions/CIK0000789019.json "HTTP/1.1 200 OK"
+2026-09-24T00:34:08+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:34:08+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 10.000000 seconds
+2026-09-24T00:34:18+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:34:18+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 3.000000 seconds
+2026-09-24T00:34:21+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:34:21+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:34:21+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 15.000000 seconds
+2026-09-24T00:34:37+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:34:39+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Microsoft+recent+developments+2024&limit=1 200
+2026-09-24T00:34:39+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Microsoft%20recent%20developments%202024 200
+2026-09-24T00:34:40+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-24T00:34:40+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:34:40+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 17.000000 seconds
+2026-09-24T00:34:58+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:34:59+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:34:59+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 7.000000 seconds
+2026-09-24T00:35:07+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:35:07+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:35:07+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 8.000000 seconds
+2026-09-24T00:35:16+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:35:17+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Microsoft+corporation+news+September+2024&limit=1 502
+2026-09-24T00:35:17+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Microsoft%20corporation%20news%20September%202024 200
+2026-09-24T00:35:18+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DMicrosoft%2Bcorporation%2Bnews%2BSeptember%2B2024%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGO3F0NUGIjB2KTMDKvvEss28BlOW6F0NZk0f2r_hNLmfaLFbPcxTpro_bhGWbJhJp2IE371LkHgyAnJSWgFD 429
+2026-09-24T00:35:19+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Microsoft+corporation+news+September+2024 200
+2026-09-24T00:35:20+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-24T00:35:20+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-24T00:35:21+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=9NhzoYqdB-AfI9bDsS1GN_uv;_ylu=RQfOMYX7jXOLbyfv6QwkZdFiiHiAspZ97KvyHf3fXr5oSNQ?p=Microsoft+corporation+news+September+2024 200
+2026-09-24T00:35:23+0530 | INFO     | primp | response: https://search.brave.com/search?q=Microsoft+corporation+news+September+2024&source=web 200
+2026-09-24T00:35:23+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:35:23+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 8.000000 seconds
+2026-09-24T00:35:32+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:35:32+0530 | INFO     | primp | response: https://news.search.yahoo.com/search?p=Microsoft 200
+2026-09-24T00:35:33+0530 | INFO     | primp | response: https://www.bing.com/news/infinitescrollajax?q=Microsoft&InfiniteScroll=1&first=11&SFX=1&cc=us&setlang=en 200
+2026-09-24T00:35:33+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:35:33+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 25.000000 seconds
+2026-09-24T00:35:58+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:35:58+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 1.000000 seconds
+2026-09-24T00:36:00+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:36:01+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Microsoft%20executive%20team%202024 200
+2026-09-24T00:36:01+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Microsoft+executive+team+2024&limit=1 200
+2026-09-24T00:36:03+0530 | INFO     | primp | response: https://search.brave.com/search?q=Microsoft+executive+team+2024&source=web 200
+2026-09-24T00:36:03+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:36:03+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 26.000000 seconds
+2026-09-24T00:36:30+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:36:30+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:36:30+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 29.000000 seconds
+2026-09-24T00:37:02+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:37:02+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:37:02+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 7.000000 seconds
+2026-09-24T00:37:09+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:37:09+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 1.000000 seconds
+2026-09-24T00:37:12+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:37:12+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:37:12+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 34.000000 seconds
+2026-09-24T00:37:46+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:37:46+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 6.000000 seconds
+2026-09-24T00:37:53+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:37:53+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:37:53+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 35.000000 seconds
+2026-09-24T00:38:30+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:38:30+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=d908201ddef14a.htm+Microsoft+2025+10A&limit=1 200
+2026-09-24T00:38:30+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=d908201ddef14a.htm%20Microsoft%202025%2010A 200
+2026-09-24T00:38:31+0530 | INFO     | primp | response: https://search.brave.com/search?q=d908201ddef14a.htm+Microsoft+2025+10A&source=web 200
+2026-09-24T00:38:31+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:38:31+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 29.000000 seconds
+2026-09-24T00:39:02+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:39:02+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Microsoft+DEF+14A+2025+executives+board+members&limit=1 200
+2026-09-24T00:39:03+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Microsoft%20DEF%2014A%202025%20executives%20board%20members 200
+2026-09-24T00:39:04+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-24T00:39:04+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:39:04+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 34.000000 seconds
+2026-09-24T00:39:41+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:39:41+0530 | INFO     | memory.episodic | Logged run ab1e25ea-22f6-44c9-9eed-21cf3c4a65dc to episodic memory (34 trace steps).
+2026-09-24T00:39:42+0530 | INFO     | config.logging_config | Logging initialized. Console level=INFO, file=logs\agent.log (DEBUG+)
+2026-09-24T00:39:44+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:39:44+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 6.000000 seconds
+2026-09-24T00:39:51+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:39:51+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:39:51+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 14.000000 seconds
+2026-09-24T00:40:07+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:40:08+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:40:08+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 13.000000 seconds
+2026-09-24T00:40:23+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:40:24+0530 | INFO     | httpx | HTTP Request: GET https://www.sec.gov/files/company_tickers.json "HTTP/1.1 200 OK"
+2026-09-24T00:40:25+0530 | INFO     | httpx | HTTP Request: GET https://data.sec.gov/submissions/CIK0000320193.json "HTTP/1.1 200 OK"
+2026-09-24T00:40:27+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:40:30+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:40:30+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 18.000000 seconds
+2026-09-24T00:40:49+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:40:50+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:40:50+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 9.000000 seconds
+2026-09-24T00:41:00+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:41:00+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:41:00+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 23.000000 seconds
+2026-09-24T00:41:24+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:41:24+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:41:24+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 18.000000 seconds
+2026-09-24T00:41:42+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:41:42+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 2.000000 seconds
+2026-09-24T00:41:45+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:41:47+0530 | INFO     | httpx | HTTP Request: GET https://data.sec.gov/submissions/CIK0000789019.json "HTTP/1.1 200 OK"
+2026-09-24T00:41:47+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:41:47+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 21.000000 seconds
+2026-09-24T00:42:08+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:42:10+0530 | INFO     | httpx | HTTP Request: GET https://data.sec.gov/submissions/CIK0001652044.json "HTTP/1.1 200 OK"
+2026-09-24T00:42:10+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:42:10+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 20.000000 seconds
+2026-09-24T00:42:31+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:42:31+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+2025+10-K+risk+factors&limit=1 200
+2026-09-24T00:42:32+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%202025%2010-K%20risk%20factors 200
+2026-09-24T00:42:32+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2B2025%2B10-K%2Brisk%2Bfactors%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGJ_J0NUGIjCrm1CrX3JYOW8GUPphgZpSXLXBJMI3rAmZPhrKrDWd2PYEoEJfd89NoWRFtIDw1jgyAnJSWgFD 429
+2026-09-24T00:42:33+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-24T00:42:34+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-24T00:42:35+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+2025+10-K+risk+factors&source=web 200
+2026-09-24T00:42:35+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:42:35+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 22.000000 seconds
+2026-09-24T00:42:58+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:42:58+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Microsoft+2026+10-K+risk+factors&limit=1 200
+2026-09-24T00:42:58+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Microsoft%202026%2010-K%20risk%20factors 200
+2026-09-24T00:42:59+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=T6jk3gYBgLBh_E24wKq-4nN2;_ylu=h7f4T_eT4Tbo4LSS81RHbBAf1O6QMGZguNYDOw2ftZRtEgg?p=Microsoft+2026+10-K+risk+factors 200
+2026-09-24T00:43:01+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-24T00:43:01+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-24T00:43:02+0530 | INFO     | primp | response: https://search.brave.com/search?q=Microsoft+2026+10-K+risk+factors&source=web 200
+2026-09-24T00:43:02+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:43:02+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 22.000000 seconds
+2026-09-24T00:43:25+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:43:27+0530 | INFO     | httpx | HTTP Request: GET https://data.sec.gov/submissions/CIK0001045810.json "HTTP/1.1 200 OK"
+2026-09-24T00:43:27+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:43:27+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 7.000000 seconds
+2026-09-24T00:43:35+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:43:36+0530 | INFO     | httpx | HTTP Request: GET https://data.sec.gov/submissions/CIK0001326801.json "HTTP/1.1 200 OK"
+2026-09-24T00:43:36+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:43:36+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 16.000000 seconds
+2026-09-24T00:43:54+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:43:54+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+2025+10-K+risk+factors+site%3Asec.gov&limit=1 200
+2026-09-24T00:43:54+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%202025%2010-K%20risk%20factors%20site%3Asec.gov 200
+2026-09-24T00:43:55+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+2025+10-K+risk+factors+site%3Asec.gov 200
+2026-09-24T00:43:56+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-24T00:43:57+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-24T00:43:57+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=Egh2PwS7AsD7A-i4xcCtvds0;_ylu=MzodovuqXlkw1zXmuF1DQkWxAOlAOCpJ5_6uT6PFSh2sIvw?p=Apple+2025+10-K+risk+factors+site%3Asec.gov 200
+2026-09-24T00:43:58+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:43:58+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 28.000000 seconds
+2026-09-24T00:44:27+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:44:27+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+2025+Form+10-K+Item+1A+Risk+Factors&limit=1 200
+2026-09-24T00:44:28+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%202025%20Form%2010-K%20Item%201A%20Risk%20Factors 200
+2026-09-24T00:44:29+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=bn4FP7EA3d_bEa1j8SfCP3is;_ylu=TuO5-LGljqSEJjmaSkV6Q1szT85W6ra15UK8IRcrAtmGUpI?p=Apple+2025+Form+10-K+Item+1A+Risk+Factors 200
+2026-09-24T00:44:29+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:44:29+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 17.000000 seconds
+2026-09-24T00:44:48+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:44:48+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=technology+sector+trends+2024+AI+cloud+cybersecurity&limit=1 200
+2026-09-24T00:44:48+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=technology%20sector%20trends%202024%20AI%20cloud%20cybersecurity 200
+2026-09-24T00:44:49+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=technology+sector+trends+2024+AI+cloud+cybersecurity 200
+2026-09-24T00:44:50+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3Dtechnology%2Bsector%2Btrends%2B2024%2BAI%2Bcloud%2Bcybersecurity%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGKnK0NUGIjDwI_P2wApR40QdfV-BqIbCEGtT_8h5pmjU65zbbOrV-DB7JZYxXnmNM2wc0C570H4yAnJSWgFD 429
+2026-09-24T00:44:51+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-24T00:44:51+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-24T00:44:51+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 24.000000 seconds
+2026-09-24T00:45:18+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-24T00:45:18+0530 | INFO     | memory.episodic | Logged run ad48383f-abb3-4744-8bd0-7d2a2aad7256 to episodic memory (30 trace steps).

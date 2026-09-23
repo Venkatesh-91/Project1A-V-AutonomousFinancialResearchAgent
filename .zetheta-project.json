@@ -1,0 +1,30 @@
+{
+  "intern_identifier": "Deshavath Venkatesh",
+  "intern_name": "Deshavath Venkatesh",
+  "intern_email": "deshavathvenkatesh8@gmail.com",
+  "project_code": "1A",
+  "project_title": "Autonomous Financial Research Agent with Multi-Source Synthesis",
+  "submission_type": "github",
+  "submission_date": "2026-09-23T00:00:00Z",
+  "tech_stack": [
+    "Python",
+    "Groq API (openai/gpt-oss-20b / openai/gpt-oss-120b)",
+    "ChromaDB",
+    "SEC EDGAR API",
+    "yfinance",
+    "ddgs (DuckDuckGo search)",
+    "SQLite"
+  ],
+  "duration_days": 15,
+  "github_repo_url": "https://github.com/Venkatesh-91/Project1A-V-AutonomousFinancialResearchAgent",
+  "assessment_criteria": {
+    "architecture_design": true,
+    "tool_orchestration": true,
+    "memory_system": true,
+    "error_handling": true,
+    "evaluation_framework": true,
+    "research_output_quality": true,
+    "code_quality": true,
+    "documentation": true
+  }
+}
