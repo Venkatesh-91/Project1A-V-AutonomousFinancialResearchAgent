@@ -858,3 +858,277 @@
 2026-09-24T00:44:51+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 24.000000 seconds
 2026-09-24T00:45:18+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2026-09-24T00:45:18+0530 | INFO     | memory.episodic | Logged run ad48383f-abb3-4744-8bd0-7d2a2aad7256 to episodic memory (30 trace steps).
+2026-09-25T08:40:46+0530 | INFO     | config.logging_config | Logging initialized. Console level=INFO, file=logs\agent.log (DEBUG+)
+2026-09-25T08:40:49+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:40:51+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:40:54+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:40:54+0530 | INFO     | httpx | HTTP Request: GET https://www.sec.gov/files/company_tickers.json "HTTP/1.1 200 OK"
+2026-09-25T08:40:56+0530 | INFO     | httpx | HTTP Request: GET https://data.sec.gov/submissions/CIK0000320193.json "HTTP/1.1 200 OK"
+2026-09-25T08:40:57+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:40:57+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:40:58+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+earnings+revenue&limit=1 502
+2026-09-25T08:40:58+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20earnings%20revenue 200
+2026-09-25T08:40:59+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+earnings+revenue&source=web 200
+2026-09-25T08:40:59+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:40:59+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 4.000000 seconds
+2026-09-25T08:41:03+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:41:03+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 1.000000 seconds
+2026-09-25T08:41:05+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:41:05+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:41:06+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20consensus%20revenue%20estimate 200
+2026-09-25T08:41:06+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+consensus+revenue+estimate&limit=1 502
+2026-09-25T08:41:07+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:41:07+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:41:07+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+consensus+revenue+estimate 200
+2026-09-25T08:41:08+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=JQxtsxjh6d_mDpvYygzH-Ge4;_ylu=7ge6Y1vHeVDjRVxo2qN8G9gwGhxNcuwpjw024F7N5zPvdI4?p=Apple+Q3+2026+consensus+revenue+estimate 200
+2026-09-25T08:41:09+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+consensus+revenue+estimate&source=web 200
+2026-09-25T08:41:09+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:41:09+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 16.000000 seconds
+2026-09-25T08:41:27+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:41:27+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:41:27+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+consensus+EPS+estimate&limit=1 502
+2026-09-25T08:41:28+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20consensus%20EPS%20estimate 200
+2026-09-25T08:41:28+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:41:28+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:41:29+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+consensus+EPS+estimate&source=web 200
+2026-09-25T08:41:29+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:41:29+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 21.000000 seconds
+2026-09-25T08:41:52+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:41:52+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:41:52+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=%22Apple%22+%22Q3%22+2026+consensus+revenue+%24108.8&limit=1 502
+2026-09-25T08:41:52+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=%22Apple%22%20%22Q3%22%202026%20consensus%20revenue%20%24108.8 200
+2026-09-25T08:41:53+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:41:54+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3D%2522Apple%2522%2B%2522Q3%2522%2B2026%2Bconsensus%2Brevenue%2B%2524108.8%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGPjM19UGIjDTmxcpYI3urYPfwgekeDitwBibzhJ3Jn9ZuYBV6j91l0NI0eqG_e42ZHukwSidM3AyAnJSWgFD 429
+2026-09-25T08:41:55+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=%22Apple%22+%22Q3%22+2026+consensus+revenue+%24108.8 200
+2026-09-25T08:41:56+0530 | INFO     | primp | response: https://search.brave.com/search?q=%22Apple%22+%22Q3%22+2026+consensus+revenue+%24108.8&source=web 200
+2026-09-25T08:41:56+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:41:56+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 21.000000 seconds
+2026-09-25T08:42:18+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:42:18+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:42:19+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=aapl-20260627%20earnings%20per%20share 200
+2026-09-25T08:42:19+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=aapl-20260627+earnings+per+share&limit=1 502
+2026-09-25T08:42:20+0530 | INFO     | primp | response: https://search.brave.com/search?q=aapl-20260627+earnings+per+share&source=web 200
+2026-09-25T08:42:20+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:42:20+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 25.000000 seconds
+2026-09-25T08:42:46+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:42:46+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:42:46+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+earnings+consensus+estimates+revenue+%24108.65+billion+EPS+%241.89&limit=1 502
+2026-09-25T08:42:46+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20earnings%20consensus%20estimates%20revenue%20%24108.65%20billion%20EPS%20%241.89 200
+2026-09-25T08:42:47+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Bearnings%2Bconsensus%2Bestimates%2Brevenue%2B%2524108.65%2Bbillion%2BEPS%2B%25241.89%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGK3N19UGIjBvaKrzt-5ZydhfXbiziO3CNxKoRkwsYa522jXoFDIGyga_FH6rwSJv1KyYkQ6QKJkyAnJSWgFD 429
+2026-09-25T08:42:48+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:42:48+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:42:49+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:42:49+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:42:49+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 23.000000 seconds
+2026-09-25T08:43:13+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:43:13+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=AAPL+Q3+2026+earnings+call+transcript&limit=1 200
+2026-09-25T08:43:13+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=AAPL%20Q3%202026%20earnings%20call%20transcript 200
+2026-09-25T08:43:14+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=AAPL+Q3+2026+earnings+call+transcript 200
+2026-09-25T08:43:15+0530 | INFO     | primp | response: https://search.brave.com/search?q=AAPL+Q3+2026+earnings+call+transcript&source=web 200
+2026-09-25T08:43:16+0530 | INFO     | httpx | HTTP Request: GET https://www.fool.com/earnings/call-transcripts/2026/08/07/apple-aapl-q3-2026-earnings-call-transcript/ "HTTP/1.1 200 OK"
+2026-09-25T08:43:16+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:43:16+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 27.000000 seconds
+2026-09-25T08:43:44+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:43:44+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:43:44+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 31.000000 seconds
+2026-09-25T08:44:16+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:44:16+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:44:16+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+earnings+consensus+estimates+revenue+%24108.65+billion+EPS+%241.89+CNBC&limit=1 200
+2026-09-25T08:44:17+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20earnings%20consensus%20estimates%20revenue%20%24108.65%20billion%20EPS%20%241.89%20CNBC 200
+2026-09-25T08:44:17+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=r6VM0EnhCAt8i4ZsPlJynRXt;_ylu=uyLj2WulqD8PBiM4i8L0pW7STBKpo7lSRK6nV3TjAiMnXrk?p=Apple+Q3+2026+earnings+consensus+estimates+revenue+%24108.65+billion+EPS+%241.89+CNBC 200
+2026-09-25T08:44:18+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Bearnings%2Bconsensus%2Bestimates%2Brevenue%2B%2524108.65%2Bbillion%2BEPS%2B%25241.89%2BCNBC%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGInO19UGIjDVHnt9M-3crAagz63BUct3NHIVCFUoKxdAQtzyzLbN0Xx3LzPB82eSznYw3LmnEtMyAnJSWgFD 429
+2026-09-25T08:44:19+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:44:19+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:44:20+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+earnings+consensus+estimates+revenue+%24108.65+billion+EPS+%241.89+CNBC&source=web 200
+2026-09-25T08:44:20+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:44:20+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 15.000000 seconds
+2026-09-25T08:44:37+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:44:37+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:44:38+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20earnings%20call%20summary%20key%20takeaways 200
+2026-09-25T08:44:38+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+earnings+call+summary+key+takeaways&limit=1 200
+2026-09-25T08:44:38+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+earnings+call+summary+key+takeaways&source=web 429
+2026-09-25T08:44:39+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+earnings+call+summary+key+takeaways 200
+2026-09-25T08:44:39+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=39TQWe4BQDVqMFigF-CJQfgn;_ylu=INonVhw9RJi7QSFyb0YcKgWUOivVSXFQp8CSIQvTz_VQ8Ao?p=Apple+Q3+2026+earnings+call+summary+key+takeaways 200
+2026-09-25T08:44:40+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:44:40+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 5.000000 seconds
+2026-09-25T08:44:45+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:44:45+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 1.000000 seconds
+2026-09-25T08:44:47+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:44:47+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:44:47+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=aapl+2026+10-Q+revenue+%24109.4+billion&limit=1 200
+2026-09-25T08:44:48+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=aapl%202026%2010-Q%20revenue%20%24109.4%20billion 200
+2026-09-25T08:44:49+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:44:49+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:44:49+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 14.000000 seconds
+2026-09-25T08:45:03+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:45:03+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 1.000000 seconds
+2026-09-25T08:45:05+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:45:05+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple%27s+consensus+estimates+for+Q3+2026+were+%24108.65+billion+in+revenue+and+%241.89+diluted+EPS.&limit=1 200
+2026-09-25T08:45:06+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%27s%20consensus%20estimates%20for%20Q3%202026%20were%20%24108.65%20billion%20in%20revenue%20and%20%241.89%20diluted%20EPS. 200
+2026-09-25T08:45:06+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple%27s+consensus+estimates+for+Q3+2026+were+%24108.65+billion+in+revenue+and+%241.89+diluted+EPS. 200
+2026-09-25T08:45:07+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:45:07+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:45:07+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple%27s+consensus+estimates+for+Q3+2026+were+%24108.65+billion+in+revenue+and+%241.89+diluted+EPS.&source=web 429
+2026-09-25T08:45:08+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:45:08+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:45:08+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 19.000000 seconds
+2026-09-25T08:45:28+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:45:28+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:45:29+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=aapl-20260627.htm%20diluted%20earnings%20per%20share 200
+2026-09-25T08:45:29+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=aapl-20260627.htm+diluted+earnings+per+share&limit=1 200
+2026-09-25T08:45:30+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:45:30+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:45:30+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 19.000000 seconds
+2026-09-25T08:45:51+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:45:51+0530 | WARNING  | tools.tool_registry | Tool 'web_search' call included unrecognized argument 'top_results' (value=5) -- dropping it and proceeding with the arguments that are recognized.
+2026-09-25T08:45:51+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20earnings%20call%20summary%20key%20takeaways%20Tim%20Cook 200
+2026-09-25T08:45:51+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+earnings+call+summary+key+takeaways+Tim+Cook&limit=1 200
+2026-09-25T08:45:52+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+earnings+call+summary+key+takeaways+Tim+Cook 200
+2026-09-25T08:45:52+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=5eC-IEtk8Ku9htyk1TKLm_U_;_ylu=uXF_G09hqDqUUEsHp1VKAhKwHX1UpmG8JqOmR9koKf9z0pI?p=Apple+Q3+2026+earnings+call+summary+key+takeaways+Tim+Cook 200
+2026-09-25T08:45:53+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:45:53+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:45:53+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+earnings+call+summary+key+takeaways+Tim+Cook&source=web 429
+2026-09-25T08:45:54+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Bearnings%2Bcall%2Bsummary%2Bkey%2Btakeaways%2BTim%2BCook%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGOjO19UGIjBXbdFVmLMQ2gO3T_yw8G_nBwAfnAkQwoeTBmIpxYahcFR3e4xaIG9zSVtCmOYz3R8yAnJSWgFD 429
+2026-09-25T08:45:54+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 202
+2026-09-25T08:45:54+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:45:54+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 2.000000 seconds
+2026-09-25T08:45:59+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:45:59+0530 | INFO     | memory.episodic | Logged run 4f52b40c-8d3c-4121-9d3b-40921db49826 to episodic memory (34 trace steps).
+2026-09-25T08:46:47+0530 | INFO     | config.logging_config | Logging initialized. Console level=INFO, file=logs\agent.log (DEBUG+)
+2026-09-25T08:46:50+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:46:52+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:46:54+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:46:57+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:46:57+0530 | INFO     | httpx | HTTP Request: GET https://www.sec.gov/files/company_tickers.json "HTTP/1.1 200 OK"
+2026-09-25T08:46:58+0530 | INFO     | httpx | HTTP Request: GET https://data.sec.gov/submissions/CIK0000320193.json "HTTP/1.1 200 OK"
+2026-09-25T08:46:58+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:46:58+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 7.000000 seconds
+2026-09-25T08:47:06+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:47:07+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:47:07+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 13.000000 seconds
+2026-09-25T08:47:21+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:47:22+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+earnings+consensus+revenue+estimate&limit=1 200
+2026-09-25T08:47:23+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20earnings%20consensus%20revenue%20estimate 200
+2026-09-25T08:47:23+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=EHZDLPDecHrXC1QA9BEUOMun;_ylu=gsa-Dnyxl0OnU-AIaLv2FkLDy_bPRWVBAgoNHlkh_Dtjjt8?p=Apple+Q3+2026+earnings+consensus+revenue+estimate 200
+2026-09-25T08:47:25+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Bearnings%2Bconsensus%2Brevenue%2Bestimate%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGMPP19UGIjArRcQWmE1wI4tlscpASjViN-IXIx1txiZcxmloRrCD2_7kPmwRuOhZQOcLxEa_bBEyAnJSWgFD 429
+2026-09-25T08:47:25+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:47:26+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:47:26+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+earnings+consensus+revenue+estimate 200
+2026-09-25T08:47:27+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+earnings+consensus+revenue+estimate&source=web 429
+2026-09-25T08:47:27+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:47:27+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 21.000000 seconds
+2026-09-25T08:47:49+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:47:49+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+2026+10-Q+July+31+2026+filing&limit=1 200
+2026-09-25T08:47:49+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%202026%2010-Q%20July%2031%202026%20filing 200
+2026-09-25T08:47:50+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=KBRqrhJGaGV7ax2K8awQM0Yi;_ylu=WqCcKl7o6c3JtCBYgTBC4x8C2q6sRcElJ8SmBPTezsur3mk?p=Apple+2026+10-Q+July+31+2026+filing 200
+2026-09-25T08:47:51+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:47:51+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 9.000000 seconds
+2026-09-25T08:48:01+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:48:02+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20consensus%20revenue%20estimate%20TipRanks 200
+2026-09-25T08:48:02+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+consensus+revenue+estimate+TipRanks&limit=1 200
+2026-09-25T08:48:03+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Bconsensus%2Brevenue%2Bestimate%2BTipRanks%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGOnP19UGIjAgd_muFrGldcTHAB54IC6hcO2NVCWLMSbzD_OJO9Uu1dPkvFXE0jtMgHZtEZnzfr0yAnJSWgFD 429
+2026-09-25T08:48:03+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+consensus+revenue+estimate+TipRanks 200
+2026-09-25T08:48:04+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:48:04+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:48:04+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 6.000000 seconds
+2026-09-25T08:48:11+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:48:11+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20consensus%20EPS%20estimate 200
+2026-09-25T08:48:11+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+consensus+EPS+estimate&limit=1 200
+2026-09-25T08:48:11+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 202
+2026-09-25T08:48:12+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+consensus+EPS+estimate&source=web 429
+2026-09-25T08:48:13+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Bconsensus%2BEPS%2Bestimate%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGPPP19UGIjA0VBDvg3uWpvwSzEhjtee5JXrh6cxjj5mlapdZCqHxvZVJU17FyOxbmXAijgMnM3MyAnJSWgFD 429
+2026-09-25T08:48:13+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:48:14+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:48:14+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+consensus+EPS+estimate 200
+2026-09-25T08:48:15+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=pJ5wByy4RB0L7csz85nIeXn_;_ylu=BBA3TooOFTc56WAofuZ2olmRT4BXTarDK_4VZBqXicYJVdQ?p=Apple+Q3+2026+consensus+EPS+estimate 200
+2026-09-25T08:48:15+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:48:15+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 15.000000 seconds
+2026-09-25T08:48:31+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:48:31+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 4.000000 seconds
+2026-09-25T08:48:36+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:48:36+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+June+27+2026+revenue+%24416+billion&limit=1 200
+2026-09-25T08:48:37+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20June%2027%202026%20revenue%20%24416%20billion 200
+2026-09-25T08:48:37+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+June+27+2026+revenue+%24416+billion 200
+2026-09-25T08:48:38+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=rsvQmnvW6gmRUtL0HPM339a0;_ylu=4gbVch3rRWWWcPlrdY6J6p_iQxfUX9tADoKdmJM7Q1K_KTo?p=Apple+June+27+2026+revenue+%24416+billion 200
+2026-09-25T08:48:39+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+June+27+2026+revenue+%24416+billion&source=web 429
+2026-09-25T08:48:39+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 202
+2026-09-25T08:48:40+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BJune%2B27%2B2026%2Brevenue%2B%2524416%2Bbillion%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGI7Q19UGIjD8TiDKfCeHrRLn2ywAIYHyDL5Ki8eh_k8ZJgesEdN9WBzOu7SXn_sWkoMe_YeQw4cyAnJSWgFD 429
+2026-09-25T08:48:41+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:48:41+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:48:41+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:48:41+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 23.000000 seconds
+2026-09-25T08:49:06+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:49:06+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+reports+Q3+2026+revenue+%24416+billion+earnings+per+share&limit=1 200
+2026-09-25T08:49:06+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20reports%20Q3%202026%20revenue%20%24416%20billion%20earnings%20per%20share 200
+2026-09-25T08:49:07+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+reports+Q3+2026+revenue+%24416+billion+earnings+per+share&source=web 429
+2026-09-25T08:49:07+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+reports+Q3+2026+revenue+%24416+billion+earnings+per+share 200
+2026-09-25T08:49:08+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:49:08+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:49:08+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 24.000000 seconds
+2026-09-25T08:49:34+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:49:34+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:49:34+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 36.000000 seconds
+2026-09-25T08:50:11+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:50:11+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=AAPL%20Q3%202026%20earnings%20call%20transcript 200
+2026-09-25T08:50:11+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=AAPL+Q3+2026+earnings+call+transcript&limit=1 200
+2026-09-25T08:50:12+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:50:13+0530 | INFO     | httpx | HTTP Request: GET https://stockanalysis.com/stocks/aapl/transcripts/658553-q3-2026/ "HTTP/1.1 200 OK"
+2026-09-25T08:50:14+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:50:14+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 2.000000 seconds
+2026-09-25T08:50:17+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:50:17+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20revenue%20consensus%20estimate%20%24109%20billion 200
+2026-09-25T08:50:18+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+revenue+consensus+estimate+%24109+billion&limit=1 200
+2026-09-25T08:50:18+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Brevenue%2Bconsensus%2Bestimate%2B%2524109%2Bbillion%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGPHQ19UGIjBBYJSvDjqZApK-SiVFPMfGn7Pxna7h4ncc_5SvGx-RT-Tctw1h461aUk_dADL297EyAnJSWgFD 429
+2026-09-25T08:50:19+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:50:19+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:50:19+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 202
+2026-09-25T08:50:20+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+revenue+consensus+estimate+%24109+billion 200
+2026-09-25T08:50:20+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+revenue+consensus+estimate+%24109+billion&source=web 429
+2026-09-25T08:50:21+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=dro1q6XudUqZ0hseykDGi4Qf;_ylu=lksAgk2DalMm71bRQ7p3tElb2kyjLD_zWN5UppFb_Vb000c?p=Apple+Q3+2026+revenue+consensus+estimate+%24109+billion 200
+2026-09-25T08:50:22+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:50:22+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 2.000000 seconds
+2026-09-25T08:50:25+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:50:25+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+consensus+revenue+estimate+tipranks&limit=1 200
+2026-09-25T08:50:25+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20consensus%20revenue%20estimate%20tipranks 200
+2026-09-25T08:50:26+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+consensus+revenue+estimate+tipranks 200
+2026-09-25T08:50:27+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=qIGlIAX4h_R1o9o_XNFdrduP;_ylu=6MNojFI4HpkPVypjp7XMCFcujvSzHnx-8zErPSo64tJbKpI?p=Apple+Q3+2026+consensus+revenue+estimate+tipranks 200
+2026-09-25T08:50:28+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:50:28+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:50:28+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 202
+2026-09-25T08:50:29+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Bconsensus%2Brevenue%2Bestimate%2Btipranks%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGPvQ19UGIjArVZmxTqvse7OvwxWhgpj5s-ZLn-9GHrxZN262u7atX_18-n3AKNKV9uUeQoax2voyAnJSWgFD 429
+2026-09-25T08:50:29+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+consensus+revenue+estimate+tipranks&source=web 429
+2026-09-25T08:50:29+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:50:29+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 31.000000 seconds
+2026-09-25T08:51:02+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:51:02+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+earnings+consensus+revenue+EPS&limit=1 200
+2026-09-25T08:51:02+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20earnings%20consensus%20revenue%20EPS 200
+2026-09-25T08:51:03+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=Apple+Q3+2026+earnings+consensus+revenue+EPS 200
+2026-09-25T08:51:04+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DApple%2BQ3%2B2026%2Bearnings%2Bconsensus%2Brevenue%2BEPS%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGJ7R19UGIjC2_qP5UMf741v8mWVcUnazj-xHL2XIfmIFmN-QYxi-emoi4SH_l_cvtW-UdSaUC9AyAnJSWgFD 429
+2026-09-25T08:51:04+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 202
+2026-09-25T08:51:04+0530 | INFO     | primp | response: https://search.yahoo.com/search;_ylt=kis5r2tOElkfyWQL7D1-DihH;_ylu=y5PbnMmH0ylGMS71sDYVFevkQHdQlkNirG0kJrKGqUetLSY?p=Apple+Q3+2026+earnings+consensus+revenue+EPS 200
+2026-09-25T08:51:05+0530 | INFO     | primp | response: https://search.brave.com/search?q=Apple+Q3+2026+earnings+consensus+revenue+EPS&source=web 429
+2026-09-25T08:51:05+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:51:06+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:51:06+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:51:06+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 19.000000 seconds
+2026-09-25T08:51:26+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:51:27+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=Apple%20Q3%202026%20EPS%20consensus%20%242.00 200
+2026-09-25T08:51:27+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=Apple+Q3+2026+EPS+consensus+%242.00&limit=1 200
+2026-09-25T08:51:28+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:51:28+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:51:28+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 23.000000 seconds
+2026-09-25T08:51:53+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:51:54+0530 | INFO     | primp | response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=%22Q3%202026%22%20%22Apple%22%20%22consensus%22%20%22revenue%22 200
+2026-09-25T08:51:54+0530 | INFO     | primp | response: https://grokipedia.com/api/typeahead?query=%22Q3+2026%22+%22Apple%22+%22consensus%22+%22revenue%22&limit=1 200
+2026-09-25T08:51:55+0530 | INFO     | primp | response: https://html.duckduckgo.com/html/ 200
+2026-09-25T08:51:55+0530 | INFO     | primp | response: https://www.mojeek.com/search?q=%22Q3+2026%22+%22Apple%22+%22consensus%22+%22revenue%22 200
+2026-09-25T08:51:56+0530 | INFO     | primp | response: https://search.brave.com/search?q=%22Q3+2026%22+%22Apple%22+%22consensus%22+%22revenue%22&source=web 429
+2026-09-25T08:51:56+0530 | INFO     | primp | response: https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3D%2522Q3%2B2026%2522%2B%2522Apple%2522%2B%2522consensus%2522%2B%2522revenue%2522%26sca_esv%3D1%26filter%3D1%26start%3D0%26hl%3Den-US%26lr%3Dlang_en%26cr%3DcountryUS&hl=en-US&q=EgRn_5LGGNPR19UGIjCDrWVmwixAQ_uxG89i1b3YDi-z3wamio9p5f9lS8UrV9RBp69yJsjlo8znoEbgtqMyAnJSWgFD 429
+2026-09-25T08:51:57+0530 | INFO     | primp | response: https://www.startpage.com/ 200
+2026-09-25T08:51:57+0530 | INFO     | primp | response: https://www.startpage.com/sp/search 200
+2026-09-25T08:51:57+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:51:57+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 32.000000 seconds
+2026-09-25T08:52:29+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-09-25T08:52:29+0530 | INFO     | groq._base_client | Retrying request to /openai/v1/chat/completions in 3.000000 seconds
+2026-09-25T08:52:35+0530 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-25T08:52:35+0530 | INFO     | memory.episodic | Logged run 34795207-08e2-4e71-8732-57c2af4c8025 to episodic memory (36 trace steps).

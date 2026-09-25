@@ -355,10 +355,14 @@ def build_default_registry() -> ToolRegistry:
         news_sentiment,
         news_sentiment_mock,
         earnings,
+        earnings_mock,
         company_profile,
+        company_profile_mock,
         peer_comparison,
+        peer_comparison_mock,
         calculator,
         fact_checker,
+        fact_checker_mock,
         report_gen,
         vector_db_search,
         vector_db_store,
@@ -372,22 +376,25 @@ def build_default_registry() -> ToolRegistry:
         "financial_data_api": (financial_api, financial_api_mock),
         "web_search": (web_search, web_search_mock),
         "news_sentiment": (news_sentiment, news_sentiment_mock),
+        # Day 7 additions:
+        "earnings_transcript": (earnings, earnings_mock),
+        "company_profile": (company_profile, company_profile_mock),
+        "peer_comparison": (peer_comparison, peer_comparison_mock),
+        "fact_checker": (fact_checker, fact_checker_mock),
     }
     for tool_name, (real_module, mock_module) in real_tools_with_fallback.items():
         schema = registry.load_schema_from_file(tool_name)
         registry.register(tool_name, schema, real_module.run)
         registry.register(tool_name, schema, mock_module.run, fallback_of=tool_name)
 
-    # Tools still on mock-only implementations (real integrations land Day 7).
-    mock_only_tools = {
-        "earnings_transcript": earnings,
-        "company_profile": company_profile,
-        "peer_comparison": peer_comparison,
+    # Tools that are genuinely real with no mock needed: calculation_engine
+    # is pure deterministic math over the agent's own inputs (nothing to
+    # fail over from), and report_generator is pure local formatting.
+    fully_real_no_mock_tools = {
         "calculation_engine": calculator,
-        "fact_checker": fact_checker,
         "report_generator": report_gen,
     }
-    for tool_name, module in mock_only_tools.items():
+    for tool_name, module in fully_real_no_mock_tools.items():
         schema = registry.load_schema_from_file(tool_name)
         registry.register(tool_name, schema, module.run)
 
